@@ -13,7 +13,7 @@ import neu.ir.cs6200.utils.FileUtils;
  *
  * @author smitha
  * @author ajay
- * @author kamalendra
+ * @author kamlendra
  */
 public class App {
 	public static void main(String[] args) {
