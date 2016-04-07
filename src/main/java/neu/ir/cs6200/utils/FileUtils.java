@@ -4,7 +4,12 @@ import static neu.ir.cs6200.constants.Const_FilePaths.Results;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
+
 public class FileUtils {
+
+	final static Logger logger = Logger.getLogger(FileUtils.class);
+
 	/**
 	 * Creates a directory if not present
 	 *
@@ -14,9 +19,9 @@ public class FileUtils {
 		File file = new File(dirName);
 		boolean result = file.mkdirs();
 		if (result) {
-			System.out.println("Directory is created!" + dirName);
+			logger.info("Directory is created!" + dirName);
 		} else {
-			System.err.println("Failed to create directory!" + dirName);
+			logger.error("Failed to create directory!" + dirName);
 		}
 	}
 

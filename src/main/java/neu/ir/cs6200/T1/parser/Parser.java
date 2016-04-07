@@ -1,12 +1,10 @@
-package neu.ir.cs6200.parser;
-
-import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirName;
+package neu.ir.cs6200.T1.parser;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,14 +16,16 @@ import com.google.common.io.Files;
 import neu.ir.cs6200.utils.FileUtils;
 
 /**
- * Converts Raw wikipedia file to file containing only title(s) and text
- * Ignoring markup notation (HTML tags), URLs, references to images, tables,
- * formulas, and navigational components.
+ * Converts cacm html file to file containing only title(s) and text Ignoring
+ * markup notation (HTML tags), URLs, references to images, tables, formulas,
+ * and navigational components.
  *
  * @author smitha
  *
  */
 public class Parser {
+
+	final static Logger logger = Logger.getLogger(Parser.class);
 
 	/**
 	 * Parses all the .html files in dirCorpus and cleanup for each page is done
@@ -37,6 +37,9 @@ public class Parser {
 	 * @param dirParsedOp
 	 */
 	public static void parseStore(String dirCorpus, String dirParsedOp) {
+
+		logger.info("In parseStore");
+
 		/** Read the page and get all the anchor tags */
 		File[] listOfFiles = null;
 		File folder = new File(dirCorpus);
@@ -54,7 +57,6 @@ public class Parser {
 
 				FileUtils.deleteFolder(dirParsedOp);
 				FileUtils.createDirectory(dirParsedOp);
-				FileUtils.deleteFolder(TokenizerDirName);
 
 				// read each file and submit it to worker thread to process
 				for (File file : listOfSaneFiles) {
@@ -62,24 +64,44 @@ public class Parser {
 
 					cleanUpTagsandDivs(doc);
 
-					StringBuilder firstPassCleanUp = removePunctation(caseFold(doc.body().text()));
-					StringBuilder numericCleanUp = new StringBuilder();
-					String[] raw_words = firstPassCleanUp.toString().split("[\\s]+");
-					for (int i = 0; i < raw_words.length; i++) {
-						String tmp = raw_words[i];
-						if (!isNumeric(raw_words[i]) && (raw_words[i].contains(".") || raw_words[i].contains(","))) {
-							tmp = tmp.replaceAll("\\,", "");
-							tmp = tmp.replaceAll("\\.", "");
-						}
-						numericCleanUp.append(tmp + " ");
-					}
+					StringBuilder strCleanUp = textCleanUp(doc.body().text());
 
-					Files.write(numericCleanUp, new File(dirParsedOp + "/" + cleanFileName(file)), Charsets.UTF_8);
+					Files.write(strCleanUp, new File(dirParsedOp + "/" + cleanFileName(file)), Charsets.UTF_8);
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Parsing error!", e);
 		}
+	}
+
+	public static StringBuilder textCleanUp(String doc) {
+		StringBuilder firstPassCleanUp = new StringBuilder(doc.trim().toLowerCase());
+		StringBuilder numericCleanUp = new StringBuilder();
+
+		String[] raw_words = firstPassCleanUp.toString().split("[\\r\\n]+");
+		boolean reachedEnd = false;
+		for (int i = 0; i < raw_words.length; i++) {
+			String[] tmp = removePunctation(raw_words[i].trim()).toString().split("[\\s]+");
+
+			for (int j = 0; j < tmp.length; j++) {
+				if (!isNumeric(tmp[j]) && ((tmp[j].contains(".") && !(tmp[j].endsWith(".") && tmp[j].length() == 2))
+						|| tmp[j].contains(","))) {
+					tmp[j] = tmp[j].replaceAll("\\,", "");
+					tmp[j] = tmp[j].replaceAll("\\.", "");
+				}
+
+				if (!(reachedEnd && isNumeric(tmp[j]))) {
+					numericCleanUp.append(tmp[j] + " ");
+					reachedEnd = false;
+				}
+
+				if (tmp[j].equals("pm") || tmp[j].equals("am")) {
+					reachedEnd = true;
+				}
+
+			}
+		}
+		return numericCleanUp;
 	}
 
 	/**
@@ -118,19 +140,6 @@ public class Parser {
 
 		Elements eleSpan = doc.select("span");
 		if (eleSpan != null) eleSpan.remove();
-
-		Elements eleOl = doc.select("ol.reflist");
-		if (eleOl != null) eleOl.remove();
-
-		Elements eleH2 = doc.select("h2");
-		ArrayList<String> removeLst = new ArrayList<>(
-				Arrays.asList("Navigation menu", "Contents", "References", "External links"));
-		for (Element ele : eleH2) {
-			for (String removeStr : removeLst) {
-				Elements tmp = ele.getElementsContainingText(removeStr);
-				tmp.remove();
-			}
-		}
 	}
 
 	/**
@@ -140,18 +149,8 @@ public class Parser {
 	 * @param str
 	 * @return
 	 */
-	private static StringBuilder removePunctation(StringBuilder str) {
-		return new StringBuilder(java.util.regex.Pattern.compile("[^\\d\\w-., ]").matcher(str).replaceAll(""));
-	}
-
-	/**
-	 * Convert document to lower case
-	 *
-	 * @param body
-	 * @return
-	 */
-	private static StringBuilder caseFold(String body) {
-		return new StringBuilder(body.toLowerCase());
+	private static StringBuilder removePunctation(String str) {
+		return new StringBuilder(java.util.regex.Pattern.compile("[^\\d\\w-.:, ]").matcher(str).replaceAll(""));
 	}
 
 	/**

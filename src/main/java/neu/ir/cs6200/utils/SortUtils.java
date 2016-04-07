@@ -22,4 +22,19 @@ public class SortUtils {
 			return e2.compareTo(e1);
 		}
 	};
+
+	public static ListMultimap<Double, String> sortMostToLeastScore(HashMap<String, Double> hm) {
+		ListMultimap<Double, String> lm = MultimapBuilder.treeKeys(DESC_ORDER_DOUBLE).arrayListValues().build();
+		for (String word : hm.keySet()) {
+			lm.put(hm.get(word), word);
+		}
+		return lm;
+	}
+
+	static final Comparator<Double> DESC_ORDER_DOUBLE = new Comparator<Double>() {
+		@Override
+		public int compare(Double e1, Double e2) {
+			return e2.compareTo(e1);
+		}
+	};
 }
