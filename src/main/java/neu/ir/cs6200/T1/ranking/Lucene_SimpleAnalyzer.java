@@ -1,8 +1,8 @@
 package neu.ir.cs6200.T1.ranking;
 
-import static neu.ir.cs6200.constants.Const_FilePaths.QueryResultsDir;
 import static neu.ir.cs6200.constants.Const_FilePaths.Temp_IndexLucene;
 import static neu.ir.cs6200.constants.Consts.IR_SystemName;
+import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_SEARCH_RES;
 
 import java.io.File;
 import java.io.FileReader;
@@ -32,7 +32,7 @@ import org.apache.lucene.util.Version;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
-import neu.ir.cs6200.querydata.ReadQueryData;
+import neu.ir.cs6200.querydata.QueryDataReader;
 
 /**
  * To create Apache Lucene index in a folder and add files into this index based
@@ -46,12 +46,13 @@ public class Lucene_SimpleAnalyzer {
 	private ArrayList<File> queue = new ArrayList<File>();
 
 	private String fullPathIndex;
+	private String queryResultDir;
 
 	public void searchLucene(String query, int qNum, String sysName) {
 		try {
 			IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(fullPathIndex)));
 			IndexSearcher searcher = new IndexSearcher(reader);
-			TopScoreDocCollector collector = TopScoreDocCollector.create(100, true);
+			TopScoreDocCollector collector = TopScoreDocCollector.create(TOPN_QUERY_SEARCH_RES, true);
 
 			Query q = new QueryParser(Version.LUCENE_47, "contents", analyzer).parse(query);
 			searcher.search(q, collector);
@@ -59,7 +60,7 @@ public class Lucene_SimpleAnalyzer {
 
 			// 4. display results
 			logger.debug("Found " + hits.length + " hits. for Q" + qNum);
-			File fileQResLucene = new File(QueryResultsDir + "/Q" + qNum + "_Lucene");
+			File fileQResLucene = new File(this.queryResultDir + "/Q" + qNum + "_Lucene");
 			for (int i = 0; i < hits.length; ++i) {
 				int docId = hits[i].doc;
 				Document d = searcher.doc(docId);
@@ -88,14 +89,16 @@ public class Lucene_SimpleAnalyzer {
 	 *
 	 * @param indexDir
 	 *            the name of the folder in which the index should be created
+	 * @param queryResultDir
 	 * @throws java.io.IOException
 	 *             when exception creating index.
 	 */
-	public Lucene_SimpleAnalyzer(String indexDir) throws IOException {
+	public Lucene_SimpleAnalyzer(String indexDir, String queryResultDir) throws IOException {
 		FSDirectory dir = FSDirectory.open(new File(indexDir));
 		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_47, analyzer);
 		writer = new IndexWriter(dir, config);
 		this.fullPathIndex = indexDir;
+		this.queryResultDir = queryResultDir;
 	}
 
 	/**
@@ -180,10 +183,11 @@ public class Lucene_SimpleAnalyzer {
 		writer.close();
 	}
 
-	private static Lucene_SimpleAnalyzer createLuceneSimpleIndexer(String indexPath, String filesForIndexPath) {
+	private static Lucene_SimpleAnalyzer createLuceneSimpleIndexer(String indexPath, String filesForIndexPath,
+			String queryResultDir) {
 		Lucene_SimpleAnalyzer indexer = null;
 		try {
-			indexer = new Lucene_SimpleAnalyzer(indexPath);
+			indexer = new Lucene_SimpleAnalyzer(indexPath, queryResultDir);
 		} catch (Exception ex) {
 			logger.error("Cannot create index..." + ex.getMessage());
 			System.exit(-1);
@@ -204,19 +208,20 @@ public class Lucene_SimpleAnalyzer {
 	}
 
 	/**
-	 * Runs Lucene program on given corpus and queries
+	 * Runs Lucene program on given corpus and raw_queries
 	 *
 	 * @param queryReader
+	 * @param queryResultDir
 	 *
 	 */
-	public static void runLucene(ReadQueryData queryReader, String parsedDirName) {
+	public static void runLucene(QueryDataReader queryReader, String parsedDirName, String queryResultDir) {
 
 		logger.info("Running Lucene.... Using SimpleAnalyzer");
-		Lucene_SimpleAnalyzer indexer = createLuceneSimpleIndexer(Temp_IndexLucene, parsedDirName);
+		Lucene_SimpleAnalyzer indexer = createLuceneSimpleIndexer(Temp_IndexLucene, parsedDirName, queryResultDir);
 
-		for (int qNum : queryReader.queries.keySet()) {
-			logger.debug("Running Lucene SimpleAnalyzer ranking for query :" + queryReader.queries.get(qNum));
-			indexer.searchLucene(queryReader.queries.get(qNum), qNum, IR_SystemName);
+		for (int qNum : queryReader.raw_queries.keySet()) {
+			logger.debug("Running Lucene SimpleAnalyzer ranking for query :" + queryReader.raw_queries.get(qNum));
+			indexer.searchLucene(queryReader.raw_queries.get(qNum), qNum, IR_SystemName);
 			logger.debug("");
 		}
 	}

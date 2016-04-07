@@ -14,7 +14,10 @@ public class Const_FilePaths {
 	public static final String DocLenFname = InvertedIndexDirName + "/" + "DocumentsLength";
 
 	public static final String QueryDataFname = "data/cacm.query";
-	public static final String QueryResultsDir = Results + "/" + "QueryResults";
+	public static final String QueryResultsDir = Results + "/" + "Query_Results";
+	public static final String Task1QueryResults = QueryResultsDir + "/" + "Task1";
+	public static final String Task2QueryResults = QueryResultsDir + "/" + "Task2";
+	public static final String Task3QueryResults = QueryResultsDir + "/" + "Task3";
 
 	public static final String Temp_IndexLucene = "./Temp_IndexLucene";
 

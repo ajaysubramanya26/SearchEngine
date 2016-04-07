@@ -1,6 +1,5 @@
 package neu.ir.cs6200.T1.ranking;
 
-import static neu.ir.cs6200.constants.Const_FilePaths.QueryResultsDir;
 import static neu.ir.cs6200.constants.Consts.IR_SystemName;
 
 import java.io.File;
@@ -15,8 +14,8 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.Files;
 
-import neu.ir.cs6200.T1.indexer.ReadIndexedData;
-import neu.ir.cs6200.querydata.ReadQueryData;
+import neu.ir.cs6200.T1.indexer.IndexedDataReader;
+import neu.ir.cs6200.querydata.QueryDataReader;
 import neu.ir.cs6200.utils.SortUtils;
 
 /**
@@ -29,11 +28,12 @@ import neu.ir.cs6200.utils.SortUtils;
 public class BM25 {
 	final static Logger logger = Logger.getLogger(BM25.class);
 
-	public BM25(double k1, double b, double k2, int topNRankedDocs) {
+	public BM25(double k1, double b, double k2, int topNRankedDocs, String queryResultDir) {
 		this.k1 = k1;
 		this.b = b;
 		this.k2 = k2;
 		this.topNRankedDocs = topNRankedDocs;
+		this.queryResultDir = queryResultDir;
 	}
 
 	double k1;
@@ -58,6 +58,8 @@ public class BM25 {
 	 * reading data from the file
 	 */
 	HashMap<String, Long> documentLenHm;
+
+	String queryResultDir;
 
 	public double getAvdl() {
 		return avdl;
@@ -127,7 +129,7 @@ public class BM25 {
 		HashMap<String, Double> rankScoreHm = new HashMap<>();
 
 		HashMap<String, Short> qTermFre = new HashMap<>();
-		computeQueryTermFre(queryStr, qTermFre);
+		QueryDataReader.computeQueryTermFre(queryStr, qTermFre);
 
 		HashSet<String> queryDocs = new HashSet<>();
 		for (String queryTerm : qTermFre.keySet()) {
@@ -164,7 +166,7 @@ public class BM25 {
 		int topRanked = 1;
 
 		try {
-			File fileQResBM25 = new File(QueryResultsDir + "/Q" + qNum + "_BM25");
+			File fileQResBM25 = new File(this.queryResultDir + "/Q" + qNum + "_BM25");
 
 			for (Double rankScore : sortedRanks.keySet()) {
 				List<String> docIds = sortedRanks.get(rankScore);
@@ -178,23 +180,6 @@ public class BM25 {
 			}
 		} catch (IOException e) {
 			logger.error("writeTopNDocsBM25Score Error in Writing", e);
-		}
-	}
-
-	/**
-	 * Computes Query term frequency
-	 *
-	 * @param queryStr
-	 * @param qTermFre
-	 */
-	private void computeQueryTermFre(String queryStr, HashMap<String, Short> qTermFre) {
-		String[] queryTerms = queryStr.split(" ");
-		for (String qTerm : queryTerms) {
-			if (qTermFre.containsKey(qTerm)) {
-				qTermFre.put(qTerm, (short) (qTermFre.get(qTerm) + 1));
-			} else {
-				qTermFre.put(qTerm, (short) 1);
-			}
 		}
 	}
 
@@ -254,7 +239,7 @@ public class BM25 {
 		return first * second * third;
 	}
 
-	public void runBM25(ReadQueryData queryReader, ReadIndexedData indexReader) {
+	public void runBM25(HashMap<Integer, String> queries, IndexedDataReader indexReader) {
 		logger.info("Running BM25");
 
 		this.setInvertedLists(indexReader.getInvertedLists());
@@ -262,9 +247,9 @@ public class BM25 {
 
 		logger.debug("Document Length HM Size " + this.getDocumentLenHm().size() + "totalDocLenCorpus "
 				+ this.totalDocLenCorpus);
-		for (int qNum : queryReader.queries.keySet()) {
-			logger.debug("Running BM25 ranking for query :" + queryReader.queries.get(qNum));
-			this.searchBM25(queryReader.queries.get(qNum), qNum, IR_SystemName);
+		for (int qNum : queries.keySet()) {
+			logger.debug("Running BM25 ranking for query :" + queries.get(qNum));
+			this.searchBM25(queries.get(qNum), qNum, IR_SystemName);
 			logger.debug("");
 		}
 	}

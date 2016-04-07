@@ -16,18 +16,26 @@ import neu.ir.cs6200.T1.parser.Parser;
  * @author smitha
  * @author ajay
  * @author kamlendra
- * @info This class reads query file in cacm format and stores queries in
+ * @info This class reads query file in cacm format and stores raw_queries in
  *       HashMap with query number and query string
  */
-public class ReadQueryData {
+public class QueryDataReader {
 
-	public HashMap<Integer, String> queries;
-	final static Logger logger = Logger.getLogger(ReadQueryData.class);
+	public HashMap<Integer, String> raw_queries;
+	final static Logger logger = Logger.getLogger(QueryDataReader.class);
+
+	public HashMap<Integer, String> getRaw_queries() {
+		return raw_queries;
+	}
+
+	public void setRaw_queries(HashMap<Integer, String> raw_queries) {
+		this.raw_queries = raw_queries;
+	}
 
 	public void readQueryDocument(String filePath) {
 		try {
 			List<String> allLines = Files.readAllLines(Paths.get(filePath), StandardCharsets.UTF_8);
-			queries = new HashMap<>();
+			raw_queries = new HashMap<>();
 
 			boolean startDoc = false;
 			boolean startDocNo = false;
@@ -60,7 +68,7 @@ public class ReadQueryData {
 						queryStr.append(allLines.get(curLineNum).trim() + " ");
 						curLineNum++;
 					}
-					queries.put(qNum, parseQuery(queryStr.toString().trim()));
+					raw_queries.put(qNum, parseQuery(queryStr.toString().trim()));
 					totalDOCTags++;
 					totalDOCNOTags++;
 				}
@@ -86,4 +94,20 @@ public class ReadQueryData {
 		return Parser.textCleanUp(query).toString();
 	}
 
+	/**
+	 * Computes Query term frequency
+	 *
+	 * @param queryStr
+	 * @param qTermFre
+	 */
+	public static void computeQueryTermFre(String queryStr, HashMap<String, Short> qTermFre) {
+		String[] queryTerms = queryStr.split(" ");
+		for (String qTerm : queryTerms) {
+			if (qTermFre.containsKey(qTerm)) {
+				qTermFre.put(qTerm, (short) (qTermFre.get(qTerm) + 1));
+			} else {
+				qTermFre.put(qTerm, (short) 1);
+			}
+		}
+	}
 }

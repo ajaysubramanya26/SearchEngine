@@ -20,15 +20,15 @@ import org.apache.log4j.Logger;
  *       HashMap<String, Long>
  *
  */
-public class ReadIndexedData {
+public class IndexedDataReader {
 
-	public ReadIndexedData() {
+	public IndexedDataReader() {
 		this.invertedLists = new HashMap<String, HashMap<String, Integer>>();
 		this.documentLenHm = new HashMap<String, Long>();
 		this.totalDocLenCorpus = 0L;
 	}
 
-	final static Logger logger = Logger.getLogger(ReadIndexedData.class);
+	final static Logger logger = Logger.getLogger(IndexedDataReader.class);
 
 	public HashMap<String, HashMap<String, Integer>> getInvertedLists() {
 		return invertedLists;
