@@ -15,4 +15,7 @@ public class Const_FilePaths {
 
 	public static final String QueryDataFname = "data/cacm.query";
 	public static final String QueryResultsDir = Results + "/" + "QueryResults";
+
+	public static final String Temp_IndexLucene = "./Temp_IndexLucene";
+
 }

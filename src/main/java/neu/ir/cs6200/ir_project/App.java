@@ -17,6 +17,7 @@ import neu.ir.cs6200.T1.indexer.ReadIndexedData;
 import neu.ir.cs6200.T1.indexer.Tokenizer;
 import neu.ir.cs6200.T1.parser.Parser;
 import neu.ir.cs6200.T1.ranking.BM25;
+import neu.ir.cs6200.T1.ranking.Lucene_SimpleAnalyzer;
 import neu.ir.cs6200.querydata.ReadQueryData;
 import neu.ir.cs6200.utils.FileUtils;
 
@@ -31,7 +32,7 @@ public class App {
 	public static void main(String[] args) {
 
 		/** Deletes all results from previous run and creates new directories */
-		FileUtils.resultsDirFileSetUp();
+		FileUtils.dirFileSetUp();
 
 		String log4jConfPath = "./log4j.properties";
 		PropertyConfigurator.configure(log4jConfPath);
@@ -59,6 +60,7 @@ public class App {
 		BM25 bm25 = new BM25(1.2, 0.75, 100, TOPN_QUERY_SEARCH_RES);
 		bm25.runBM25(queryReader, indexReader);
 
+		Lucene_SimpleAnalyzer.runLucene(queryReader, ParsedDirName);
 	}
 
 }

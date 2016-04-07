@@ -1,6 +1,7 @@
 package neu.ir.cs6200.utils;
 
 import static neu.ir.cs6200.constants.Const_FilePaths.Results;
+import static neu.ir.cs6200.constants.Const_FilePaths.Temp_IndexLucene;
 
 import java.io.File;
 
@@ -47,7 +48,8 @@ public class FileUtils {
 		folder.delete();
 	}
 
-	public static void resultsDirFileSetUp() {
+	public static void dirFileSetUp() {
 		deleteFolder(Results);
+		deleteFolder(Temp_IndexLucene);
 	}
 }
