@@ -25,6 +25,7 @@ public class IndexedDataReader {
 	public IndexedDataReader() {
 		this.invertedLists = new HashMap<String, HashMap<String, Integer>>();
 		this.documentLenHm = new HashMap<String, Long>();
+		this.totalTermsPerDoc = new HashMap<String, Long>();
 		this.totalDocLenCorpus = 0L;
 	}
 
@@ -59,14 +60,19 @@ public class IndexedDataReader {
 	long totalDocLenCorpus;
 
 	/**
-	 * Read inverted Index
+	 * Stores the total number of terms per doc. Used to calculate term
+	 * frequency
+	 */
+	HashMap<String, Long> totalTermsPerDoc;
+
+	/**
+	 * Read inverted Index. Stores invertedLists and also computes
+	 * totalTermsPerDoc
 	 *
 	 * @param filePath
-	 * @param bm25
 	 * @return
 	 */
 	public void deserializeInvertedIndex(String filePath) {
-		invertedLists = new HashMap<>();
 		try {
 			List<String> rawInvertedList = Files.readAllLines(Paths.get(filePath), StandardCharsets.UTF_8);
 			if (rawInvertedList.size() != 0) {
@@ -83,7 +89,16 @@ public class IndexedDataReader {
 								if (docAndFre.length != 2) {
 									logger.error("Too many tokens docId, term frequency :" + docIdFre);
 								}
-								if (docAndFre.length == 2) docIdFreHm.put(docAndFre[0], Integer.parseInt(docAndFre[1]));
+								if (docAndFre.length == 2) {
+									int tf = Integer.parseInt(docAndFre[1]);
+									docIdFreHm.put(docAndFre[0], tf);
+
+									if (totalTermsPerDoc.containsKey(docAndFre[0])) {
+										totalTermsPerDoc.put(docAndFre[0], totalTermsPerDoc.get(docAndFre[0]) + tf);
+									} else {
+										totalTermsPerDoc.put(docAndFre[0], (long) tf);
+									}
+								}
 							} catch (NumberFormatException e) {
 								logger.error("Number Format exception :" + docAndFre[1]);
 							}
@@ -99,6 +114,14 @@ public class IndexedDataReader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public HashMap<String, Long> getTotalTermsPerDoc() {
+		return totalTermsPerDoc;
+	}
+
+	public void setTotalTermsPerDoc(HashMap<String, Long> totalTermsPerDoc) {
+		this.totalTermsPerDoc = totalTermsPerDoc;
 	}
 
 	/**

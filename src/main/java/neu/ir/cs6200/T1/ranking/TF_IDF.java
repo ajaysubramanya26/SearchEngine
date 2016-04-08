@@ -32,6 +32,20 @@ public class TF_IDF {
 	 */
 	HashMap<String, Long> documentLenHm;
 
+	/**
+	 * Stores the total number of terms per doc. Used to calculate term
+	 * frequency
+	 */
+	HashMap<String, Long> totalTermsPerDoc;
+
+	public HashMap<String, Long> getTotalTermsPerDoc() {
+		return totalTermsPerDoc;
+	}
+
+	public void setTotalTermsPerDoc(HashMap<String, Long> totalTermsPerDoc) {
+		this.totalTermsPerDoc = totalTermsPerDoc;
+	}
+
 	int topNRankedDocs;
 	String queryResultDir;
 
@@ -62,17 +76,26 @@ public class TF_IDF {
 	/**
 	 * Using log normalization for computing term frequency (1 +
 	 * log(tf(t,docId)). logarithmically scaled frequency: tf(t,d) = 1 + log
-	 * ft,d, or zero if ft,d is zero;
+	 * ft,d, or zero if ft,d is zero; Reference :Wikipedia
+	 *
 	 *
 	 * @param qTerm
 	 * @param docId
 	 * @return
 	 */
 	private double computeTermFrequency(String qTerm, String docId) {
-		int tf = 0;
-		if (invertedLists.get(qTerm) != null && invertedLists.get(qTerm).get(docId) != null) {
+		double tf = 0.0;
+		if (invertedLists.get(qTerm) != null && invertedLists.get(qTerm).get(docId) != null
+				&& this.totalTermsPerDoc.get(docId) != null) {
+
 			tf = invertedLists.get(qTerm).get(docId);
+
 			return (1 + Math.log(tf));
+
+			// NOTE : Traditional way of calculating term frequency
+			// double total = this.totalTermsPerDoc.get(docId);
+			// tf = invertedLists.get(qTerm).get(docId);
+			// return tf / total;
 		} else {
 			return 0;
 		}
@@ -165,6 +188,7 @@ public class TF_IDF {
 
 		this.setInvertedLists(indexReader.getInvertedLists());
 		this.setDocumentLenHm(indexReader.getDocumentLenHm());
+		this.setTotalTermsPerDoc(indexReader.getTotalTermsPerDoc());
 
 		for (int qNum : queries.keySet()) {
 			logger.debug("Running TF-IDF ranking for query :" + queries.get(qNum));
