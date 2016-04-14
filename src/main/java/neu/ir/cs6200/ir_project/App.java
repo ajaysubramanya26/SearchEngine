@@ -47,6 +47,7 @@ public class App {
 			return;
 		}
 
+		Parser.setUseStopList(true);
 		Parser.parseStore(CorpusDirLoc, ParsedDirName);
 		Tokenizer.tokenizeIndex(ParsedDirName, 1);
 

@@ -3,6 +3,7 @@ package neu.ir.cs6200.T1.parser;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -25,6 +26,8 @@ import neu.ir.cs6200.utils.FileUtils;
  */
 public class Parser {
 
+	private static Boolean useStopList = false;
+	private static String[] stopWords = null;
 	final static Logger logger = Logger.getLogger(Parser.class);
 
 	/**
@@ -39,6 +42,9 @@ public class Parser {
 	public static void parseStore(String dirCorpus, String dirParsedOp) {
 
 		logger.info("In parseStore");
+
+		logger.info("using stop words list : " + getUseStopList());
+		if (useStopList) getStopWords();
 
 		/** Read the page and get all the anchor tags */
 		File[] listOfFiles = null;
@@ -90,7 +96,7 @@ public class Parser {
 					tmp[j] = tmp[j].replaceAll("\\.", "");
 				}
 
-				if (!(reachedEnd && isNumeric(tmp[j]))) {
+				if (!(reachedEnd && isNumeric(tmp[j])) && isStopWord(tmp[j])) {
 					numericCleanUp.append(tmp[j] + " ");
 					reachedEnd = false;
 				}
@@ -118,7 +124,7 @@ public class Parser {
 	}
 
 	/**
-	 * Remove divtags and html tags that do not contribute to the data
+	 * Remove div tags and html tags that do not contribute to the data
 	 *
 	 * @param doc
 	 */
@@ -158,6 +164,36 @@ public class Parser {
 	 */
 	public static boolean isNumeric(String str) {
 		return str.matches("-?\\d+(\\.\\d+)?") || str.matches("-?\\d+([,]\\d+)*(\\.)?\\d+([,]\\d+)*");
+	}
+
+	/**
+	 * 
+	 * @param str
+	 * @return if the given string is a stop-word or not
+	 */
+	public static boolean isStopWord(String str) {
+		return Arrays.asList(stopWords).contains(str);
+	}
+
+	/**
+	 * retrieves the stop words from the provided file
+	 */
+	private static void getStopWords() {
+		String stopWrdsFile = null;
+		try {
+			stopWrdsFile = org.apache.commons.io.FileUtils.readFileToString((new File("data/common_words")));
+		} catch (IOException e) {
+			logger.error("Exception while reading stop list file + " + e.getMessage());
+		}
+		stopWords = stopWrdsFile.split("\n");
+	}
+
+	public static Boolean getUseStopList() {
+		return useStopList;
+	}
+
+	public static void setUseStopList(Boolean useStopList) {
+		Parser.useStopList = useStopList;
 	}
 
 }
