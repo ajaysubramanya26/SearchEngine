@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,12 +25,12 @@ import neu.ir.cs6200.utils.FileUtils;
  * and navigational components.
  *
  * @author smitha
- *
+ * @author ajay
  */
 public class Parser {
 
-	private static Boolean useStopList = false;
-	private static String[] stopWords = null;
+	private static Boolean useStopList;
+	private static String[] stopWords;
 	final static Logger logger = Logger.getLogger(Parser.class);
 
 	/**
@@ -80,6 +83,48 @@ public class Parser {
 		}
 	}
 
+	/**
+	 * 
+	 * @param dir
+	 *            the path of the file containing the stemmed corpus
+	 * @param numDocs
+	 *            the number of stemmed documents in the file
+	 */
+	public static void parseStmdCrps(String dir, int numDocs) {
+		Map<Integer, String> stemmed = new HashMap<>();
+		String corpus = null;
+		try {
+			corpus = org.apache.commons.io.FileUtils.readFileToString(new File(dir));
+		} catch (IOException e) {
+			logger.error("error while reading cacm stemmed file " + e.getMessage());
+		}
+
+		for (int i = 1; i <= numDocs; i++) {
+			int start = i;
+			int end = start + 1;
+			String record = i != numDocs ? StringUtils.substringBetween(corpus, "# " + start, "# " + end)
+					: StringUtils.substringAfter(corpus, "# " + i);
+			stemmed.put(i, clean(record));
+		}
+
+	}
+
+	/**
+	 * removes the unwanted data from the corpus
+	 * 
+	 * @param record
+	 *            the record with junk
+	 * @return the record that does not contain junk
+	 */
+	private static String clean(String record) {
+		return StringUtils.substringBeforeLast(record, record.contains("pm") ? "pm" : "am");
+	}
+
+	/**
+	 * 
+	 * @param doc
+	 * @return cleans us the supplied doc
+	 */
 	public static StringBuilder textCleanUp(String doc) {
 		StringBuilder firstPassCleanUp = new StringBuilder(doc.trim().toLowerCase());
 		StringBuilder numericCleanUp = new StringBuilder();
