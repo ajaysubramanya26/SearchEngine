@@ -23,5 +23,6 @@ public class Const_FilePaths {
 	
 	public static final String CACM_RELEVANCE_FILE = "data/cacm.rel";
 	public static final String QUERY_RESULT_FILE_PATH = "Results/Query_Results/Task1/";
+	public static final String QUERY_EVALUATION_RESULT = "Results/Evaluation_Results/";
 
 }

@@ -4,8 +4,10 @@
 package neu.ir.cs6200.evaluator;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +50,11 @@ public class SearchEngineEvaluator {
 		relevanceGroundTruth = loadGroundTruth();
 	}
 
+	/**
+	 * Loads the relevance ground truth for evaluation.
+	 * 
+	 * @return
+	 */
 	private Map<Integer, Set<String>> loadGroundTruth() {
 		BufferedReader reader = null;
 		Map<Integer, Set<String>> relevanceGroundTruth = new HashMap<Integer, Set<String>>();
@@ -76,35 +83,92 @@ public class SearchEngineEvaluator {
 		}
 		return relevanceGroundTruth;
 	}
+	
+	public void evaluate() {
+		Mode[] modes = new Mode[] {Mode.BM25, Mode.LUCENE, Mode.TFIDF};
+		for(Mode mode : modes) {
+			double totalAveragePrecision = 0;
+			double totalReciprocalRank = 0;
+			for(int i=1; i<=64 ; i++) {
+				QueryEvaluationSummary querySummary = evaluate(i, mode);
+				if(querySummary != null) {
+					totalAveragePrecision += querySummary.getAveragePrecision();
+					totalReciprocalRank += (double) 1 / querySummary.getReciprocalRank();
+				}
+ 			}
+			
+		}
+	}
 
 	/**
 	 * Evaluates the search results for the given query.
-	 * 
 	 * @param queryId
 	 * @param mode
 	 */
-	public void evaluate(int queryId, Mode mode) {
+	private QueryEvaluationSummary evaluate(int queryId, Mode mode) {
 		List<String> searchResults = loadQuerySearchResult(queryId, mode);
 		Set<String> relevanceGroundTruth = this.relevanceGroundTruth.get(queryId);
 		if (relevanceGroundTruth.isEmpty()) {
 			LOGGER.error("No ground truth found for query :" + queryId + " - " + mode.mode);
-			return;
+			return null;
 		}
 		int totalRelevantDocuments = relevanceGroundTruth.size();
 		int relevantCount = 0;
+		double totalPrecision = 0;
+		int firstRelevantRank = 0;
+		boolean relevantRankFound = false;
 
 		List<EvaluationResult> result = new ArrayList<EvaluationResult>();
 		for (int i = 0; i < searchResults.size(); i++) {
-			relevantCount = relevanceGroundTruth.contains(searchResults.get(i)) ? relevantCount + 1 : relevantCount;
-			result.add(new EvaluationResult(i, (double) relevantCount / (i + 1),
-					(double) relevantCount / totalRelevantDocuments));
+			boolean relevant = relevanceGroundTruth.contains(searchResults.get(i));
+			relevantCount = relevant ? relevantCount + 1 : relevantCount;
+			double precision = (double) relevantCount / (i + 1);
+			double recall = (double) relevantCount / totalRelevantDocuments;
+			if (relevant) {
+				totalPrecision += precision;
+				if (!relevantRankFound) {
+					firstRelevantRank = i + 1;
+					relevantRankFound = true;
+				}
+			}
+			result.add(new EvaluationResult(i + 1, precision, recall));
 		}
+		writeRankWiseResults(result, queryId, mode);
+		double averagePrecision = relevantRankFound ? (double) totalPrecision / relevantCount : 0;
+		QueryEvaluationSummary summary = new QueryEvaluationSummary(averagePrecision, firstRelevantRank, result);
 		System.out.println("Doe");
+		return summary;
+	}
+
+	/**
+	 * Write the result.
+	 * @param result
+	 * @param queryId
+	 * @param mode
+	 */
+	private void writeRankWiseResults(List<EvaluationResult> result, int queryId, Mode mode) {
+		BufferedWriter writer = null;
+		try {
+			writer = new BufferedWriter(new FileWriter(
+					new File(getSearchResultFileName(Const_FilePaths.QUERY_EVALUATION_RESULT, queryId, mode))));
+			for(EvaluationResult evalResult : result) {
+				writer.write(evalResult.toString() + "\n");
+			}
+		} catch (IOException e) {
+			LOGGER.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			try {
+				writer.close();
+			} catch (IOException e) {
+				LOGGER.error(e.getMessage());
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
 	 * Loads the search result for a given query.
-	 * 
 	 * @param queryId
 	 * @param mode
 	 *            retrieval model
@@ -114,7 +178,8 @@ public class SearchEngineEvaluator {
 		List<String> searchResults = new ArrayList<String>();
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new FileReader(new File(getSearchResultFileName(queryId, mode))));
+			reader = new BufferedReader(new FileReader(
+					new File(getSearchResultFileName(Const_FilePaths.QUERY_RESULT_FILE_PATH, queryId, mode))));
 			String line = null;
 			while ((line = reader.readLine()) != null) {
 				String document = line.split("\\s")[2];
@@ -141,8 +206,8 @@ public class SearchEngineEvaluator {
 	 * @param mode
 	 * @return
 	 */
-	private String getSearchResultFileName(int queryId, Mode mode) {
-		StringBuilder builder = new StringBuilder(Const_FilePaths.QUERY_RESULT_FILE_PATH);
+	private String getSearchResultFileName(String folderPath, int queryId, Mode mode) {
+		StringBuilder builder = new StringBuilder(folderPath);
 		builder.append("Q");
 		builder.append(queryId);
 		builder.append("_");
