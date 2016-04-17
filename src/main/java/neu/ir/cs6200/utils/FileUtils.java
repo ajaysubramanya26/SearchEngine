@@ -52,4 +52,5 @@ public class FileUtils {
 		deleteFolder(Results);
 		deleteFolder(Temp_IndexLucene);
 	}
+
 }

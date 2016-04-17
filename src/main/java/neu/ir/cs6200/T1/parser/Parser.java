@@ -3,7 +3,11 @@ package neu.ir.cs6200.T1.parser;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,10 +25,12 @@ import neu.ir.cs6200.utils.FileUtils;
  * and navigational components.
  *
  * @author smitha
- *
+ * @author ajay
  */
 public class Parser {
 
+	private static Boolean useStopList;
+	private static String[] stopWords;
 	final static Logger logger = Logger.getLogger(Parser.class);
 
 	/**
@@ -39,6 +45,9 @@ public class Parser {
 	public static void parseStore(String dirCorpus, String dirParsedOp) {
 
 		logger.info("In parseStore");
+
+		logger.info("using stop words list : " + getUseStopList());
+		if (useStopList) getStopWords();
 
 		/** Read the page and get all the anchor tags */
 		File[] listOfFiles = null;
@@ -74,6 +83,48 @@ public class Parser {
 		}
 	}
 
+	/**
+	 * 
+	 * @param dir
+	 *            the path of the file containing the stemmed corpus
+	 * @param numDocs
+	 *            the number of stemmed documents in the file
+	 */
+	public static void parseStmdCrps(String dir, int numDocs) {
+		Map<Integer, String> stemmed = new HashMap<>();
+		String corpus = null;
+		try {
+			corpus = org.apache.commons.io.FileUtils.readFileToString(new File(dir));
+		} catch (IOException e) {
+			logger.error("error while reading cacm stemmed file " + e.getMessage());
+		}
+
+		for (int i = 1; i <= numDocs; i++) {
+			int start = i;
+			int end = start + 1;
+			String record = i != numDocs ? StringUtils.substringBetween(corpus, "# " + start, "# " + end)
+					: StringUtils.substringAfter(corpus, "# " + i);
+			stemmed.put(i, clean(record));
+		}
+
+	}
+
+	/**
+	 * removes the unwanted data from the corpus
+	 * 
+	 * @param record
+	 *            the record with junk
+	 * @return the record that does not contain junk
+	 */
+	private static String clean(String record) {
+		return StringUtils.substringBeforeLast(record, record.contains("pm") ? "pm" : "am");
+	}
+
+	/**
+	 * 
+	 * @param doc
+	 * @return cleans us the supplied doc
+	 */
 	public static StringBuilder textCleanUp(String doc) {
 		StringBuilder firstPassCleanUp = new StringBuilder(doc.trim().toLowerCase());
 		StringBuilder numericCleanUp = new StringBuilder();
@@ -90,7 +141,7 @@ public class Parser {
 					tmp[j] = tmp[j].replaceAll("\\.", "");
 				}
 
-				if (!(reachedEnd && isNumeric(tmp[j]))) {
+				if (!(reachedEnd && isNumeric(tmp[j])) && isStopWord(tmp[j])) {
 					numericCleanUp.append(tmp[j] + " ");
 					reachedEnd = false;
 				}
@@ -118,7 +169,7 @@ public class Parser {
 	}
 
 	/**
-	 * Remove divtags and html tags that do not contribute to the data
+	 * Remove div tags and html tags that do not contribute to the data
 	 *
 	 * @param doc
 	 */
@@ -158,6 +209,36 @@ public class Parser {
 	 */
 	public static boolean isNumeric(String str) {
 		return str.matches("-?\\d+(\\.\\d+)?") || str.matches("-?\\d+([,]\\d+)*(\\.)?\\d+([,]\\d+)*");
+	}
+
+	/**
+	 * 
+	 * @param str
+	 * @return if the given string is a stop-word or not
+	 */
+	public static boolean isStopWord(String str) {
+		return Arrays.asList(stopWords).contains(str);
+	}
+
+	/**
+	 * retrieves the stop words from the provided file
+	 */
+	private static void getStopWords() {
+		String stopWrdsFile = null;
+		try {
+			stopWrdsFile = org.apache.commons.io.FileUtils.readFileToString((new File("data/common_words")));
+		} catch (IOException e) {
+			logger.error("Exception while reading stop list file + " + e.getMessage());
+		}
+		stopWords = stopWrdsFile.split("\n");
+	}
+
+	public static Boolean getUseStopList() {
+		return useStopList;
+	}
+
+	public static void setUseStopList(Boolean useStopList) {
+		Parser.useStopList = useStopList;
 	}
 
 }
