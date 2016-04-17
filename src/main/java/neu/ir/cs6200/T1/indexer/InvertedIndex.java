@@ -9,7 +9,6 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.Files;
 
@@ -20,13 +19,11 @@ import neu.ir.cs6200.utils.SortUtils;
  * storing in file system
  *
  * @author smitha
- * @author ajay
- * @author kamlendra
  *
  */
 public class InvertedIndex {
 
-	HashMap<String, ListMultimap<String, Long>> invertedIndex;
+	HashMap<String, HashMap<String, Long>> invertedIndex;
 	final static Logger logger = Logger.getLogger(InvertedIndex.class);
 
 	public InvertedIndex() {
@@ -36,21 +33,19 @@ public class InvertedIndex {
 	/**
 	 * Add each document's term and frequency to inverted index
 	 *
-	 * @param lm2
+	 * @param hm
 	 * @param invertedIndex
 	 * @param docId
 	 */
-	public void addToInvertedIndex(ListMultimap<Long, String> lm2,
-			HashMap<String, ListMultimap<String, Long>> invertedIndex, String docId) {
-		for (Long wordFre : lm2.keySet()) {
-			for (String word : lm2.get(wordFre)) {
-				if (invertedIndex.containsKey(word)) {
-					invertedIndex.get(word).put(docId, wordFre);
-				} else {
-					ListMultimap<String, Long> newWordLst = ArrayListMultimap.create();
-					newWordLst.put(docId, wordFre);
-					invertedIndex.put(word, newWordLst);
-				}
+	public void addToInvertedIndex(HashMap<String, Long> hm, HashMap<String, HashMap<String, Long>> invertedIndex,
+			String docId) {
+		for (String word : hm.keySet()) {
+			if (invertedIndex.containsKey(word)) {
+				invertedIndex.get(word).put(docId, hm.get(word));
+			} else {
+				HashMap<String, Long> newWordLst = new HashMap<>();
+				newWordLst.put(docId, hm.get(word));
+				invertedIndex.put(word, newWordLst);
 			}
 		}
 	}
@@ -61,12 +56,12 @@ public class InvertedIndex {
 	 * @param invertedIndex
 	 * @param docId
 	 */
-	public void storeInvertedIndex(HashMap<String, ListMultimap<String, Long>> invertedIndex, String fileName) {
+	public void storeInvertedIndex(HashMap<String, HashMap<String, Long>> invertedIndex, String fileName) {
 		SortedSet<String> lexiWords = new TreeSet<String>(invertedIndex.keySet());
 
 		File file = new File(fileName);
 		for (String word : lexiWords) {
-			ListMultimap<String, Long> row = invertedIndex.get(word);
+			HashMap<String, Long> row = invertedIndex.get(word);
 			try {
 				SortedSet<String> lexiDocIds = new TreeSet<String>(row.keySet());
 				Files.append(new StringBuilder(word + " -> "), file, Charsets.UTF_8);
@@ -74,7 +69,7 @@ public class InvertedIndex {
 				String sep = ",";
 				for (String docId : lexiDocIds) {
 					if (++count == lexiDocIds.size()) sep = "";
-					Files.append(new StringBuilder("(" + docId + "," + row.get(docId).get(0) + ")" + sep), file,
+					Files.append(new StringBuilder("(" + docId + "," + row.get(docId) + ")" + sep), file,
 							Charsets.UTF_8);
 				}
 				Files.append(new StringBuilder("\n"), file, Charsets.UTF_8);
@@ -90,18 +85,21 @@ public class InvertedIndex {
 	 * @param invertedIndex
 	 * @param fileName
 	 */
-	public void storeTermFrequency(HashMap<String, ListMultimap<String, Long>> invertedIndex, String fileName) {
+	public void storeTermFrequency(HashMap<String, HashMap<String, Long>> invertedIndex, String fileName) {
 
 		HashMap<String, Long> termFrequency = new HashMap<>();
 		for (String word : invertedIndex.keySet()) {
-			ListMultimap<String, Long> row = invertedIndex.get(word);
+			HashMap<String, Long> row = invertedIndex.get(word);
 			long termFre = 0;
 			for (String docId : row.keySet()) {
-				termFre += row.get(docId).get(0);
+				termFre += row.get(docId);
 			}
 			termFrequency.put(word, termFre);
 		}
 
+		/**
+		 * Sort the tokens
+		 */
 		ListMultimap<Long, String> tf = SortUtils.sortMostToLeastFrequent(termFrequency);
 
 		File file = new File(fileName);
@@ -122,14 +120,14 @@ public class InvertedIndex {
 	 * @param invertedIndex
 	 * @param fileName
 	 */
-	public void storeDocFrequencyPerTerm(HashMap<String, ListMultimap<String, Long>> invertedIndex, String fileName) {
+	public void storeDocFrequencyPerTerm(HashMap<String, HashMap<String, Long>> invertedIndex, String fileName) {
 
 		SortedSet<String> lexiWords = new TreeSet<String>(invertedIndex.keySet());
 		String sep = ",";
 		File file = new File(fileName);
 		for (String word : lexiWords) {
 			try {
-				ListMultimap<String, Long> row = invertedIndex.get(word);
+				HashMap<String, Long> row = invertedIndex.get(word);
 				long count = 0;
 				int num = 0;
 				sep = ",";

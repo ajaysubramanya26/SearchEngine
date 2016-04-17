@@ -7,6 +7,12 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 
+/**
+ * General file Utils like create directory, delete directory etc
+ * 
+ * @author smitha
+ *
+ */
 public class FileUtils {
 
 	final static Logger logger = Logger.getLogger(FileUtils.class);

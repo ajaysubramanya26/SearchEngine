@@ -18,6 +18,11 @@ import neu.ir.cs6200.T1.indexer.IndexedDataReader;
 import neu.ir.cs6200.querydata.QueryDataReader;
 import neu.ir.cs6200.utils.SortUtils;
 
+/**
+ *
+ * @author smitha
+ * @info Class Computes TF-IDF ranking
+ */
 public class TF_IDF {
 
 	final static Logger logger = Logger.getLogger(TF_IDF.class);

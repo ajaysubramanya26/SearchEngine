@@ -12,8 +12,6 @@ import org.apache.log4j.Logger;
 /**
  *
  * @author smitha
- * @author ajay
- * @author kamlendra
  * @info Contains functions to reads inverted index file into Data Structure
  *       HashMap<String, HashMap<String, Integer>> => Term, HashMap<DocId,
  *       Frequency> and DocumentLength file to read into Data Structure

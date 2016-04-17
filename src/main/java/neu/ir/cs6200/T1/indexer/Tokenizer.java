@@ -15,18 +15,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.ListMultimap;
 import com.google.common.io.Files;
 
 import neu.ir.cs6200.utils.FileUtils;
-import neu.ir.cs6200.utils.SortUtils;
 
 /**
  * Tokenizer and InvertedIndex formation
  *
  * @author smitha
- * @author ajay
- * @author kamlendra
  *
  */
 public class Tokenizer {
@@ -76,15 +72,23 @@ public class Tokenizer {
 		}
 	}
 
+	/**
+	 * Reads each file, tokenizes and stores in the Inverted Index
+	 * 
+	 * @param sb
+	 * @param docId
+	 * @param indexer
+	 * @param N
+	 */
 	public static void tokenizeInvertedIndex(StringBuilder sb, String docId, InvertedIndex indexer, int N) {
 		String[] raw_words = sb.toString().split("[\\s]+");
 
 		switch (N) {
 		case 1:
 			HashMap<String, Long> hm = new HashMap<>();
-			ListMultimap<Long, String> lm = termFrequencyFileN1(raw_words, hm);
-			storeTokensEachDoc(docId, TokenizerDirName, lm);
-			indexer.addToInvertedIndex(lm, indexer.invertedIndex, docId);
+			termFrequencyFileN1(raw_words, hm);
+			storeTokensEachDoc(docId, TokenizerDirName, hm);
+			indexer.addToInvertedIndex(hm, indexer.invertedIndex, docId);
 			break;
 
 		default:
@@ -92,18 +96,25 @@ public class Tokenizer {
 		}
 	}
 
-	private static void storeTokensEachDoc(String docId, String dirName, ListMultimap<Long, String> lm) {
+	/**
+	 * Stores tokens for each Document
+	 *
+	 * @param docId
+	 * @param dirName
+	 * @param hm
+	 */
+	private static void storeTokensEachDoc(String docId, String dirName, HashMap<String, Long> hm) {
 
 		File file = new File(dirName + "/" + docId);
 		File fileDocLen = new File(DocLenFname);
 		int docLen = 0;
 		try {
-			for (Long wordFre : lm.keySet()) {
-				for (String word : lm.get(wordFre)) {
-					docLen += wordFre;
-					Files.append(new StringBuilder(word + "," + wordFre + "\n"), file, Charsets.UTF_8);
-				}
+
+			for (String word : hm.keySet()) {
+				docLen += hm.get(word);
+				Files.append(new StringBuilder(word + "," + hm.get(word) + "\n"), file, Charsets.UTF_8);
 			}
+
 			Files.append(new StringBuilder(docId + "," + docLen + "\n"), fileDocLen, Charsets.UTF_8);
 		} catch (IOException e) {
 			logger.error("Tokenizer and DocLen Files not created", e);
@@ -117,7 +128,7 @@ public class Tokenizer {
 	 * @param words
 	 * @param hm
 	 */
-	private static ListMultimap<Long, String> termFrequencyFileN1(String[] words, HashMap<String, Long> hm) {
+	private static void termFrequencyFileN1(String[] words, HashMap<String, Long> hm) {
 		for (int i = 0; i < words.length; i++) {
 			if (words[i].equals("")) continue;
 			if (hm.containsKey(words[i])) {
@@ -126,7 +137,5 @@ public class Tokenizer {
 				hm.put(words[i], (long) 1);
 			}
 		}
-
-		return SortUtils.sortMostToLeastFrequent(hm);
 	}
 }

@@ -6,6 +6,12 @@ import java.util.HashMap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 
+/**
+ * Sort Utility
+ * 
+ * @author smitha
+ *
+ */
 public class SortUtils {
 	public static ListMultimap<Long, String> sortMostToLeastFrequent(HashMap<String, Long> hm) {
 		ListMultimap<Long, String> lm = MultimapBuilder.treeKeys(DESC_ORDER).arrayListValues().build();

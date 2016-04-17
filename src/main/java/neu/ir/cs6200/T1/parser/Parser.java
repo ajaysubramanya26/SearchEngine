@@ -33,6 +33,10 @@ public class Parser {
 	private static String[] stopWords;
 	final static Logger logger = Logger.getLogger(Parser.class);
 
+	Parser() {
+		useStopList = false;
+	}
+
 	/**
 	 * Parses all the .html files in dirCorpus and cleanup for each page is done
 	 * retaining necessary text. Then the file is stored in the dirParsedOp
@@ -46,8 +50,10 @@ public class Parser {
 
 		logger.info("In parseStore");
 
-		logger.info("using stop words list : " + getUseStopList());
-		if (useStopList) getStopWords();
+		if (useStopList) {
+			getStopWords();
+			logger.info("using stop words list : " + getUseStopList());
+		}
 
 		/** Read the page and get all the anchor tags */
 		File[] listOfFiles = null;
@@ -84,7 +90,7 @@ public class Parser {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param dir
 	 *            the path of the file containing the stemmed corpus
 	 * @param numDocs
@@ -111,7 +117,7 @@ public class Parser {
 
 	/**
 	 * removes the unwanted data from the corpus
-	 * 
+	 *
 	 * @param record
 	 *            the record with junk
 	 * @return the record that does not contain junk
@@ -121,7 +127,7 @@ public class Parser {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param doc
 	 * @return cleans us the supplied doc
 	 */
@@ -141,7 +147,8 @@ public class Parser {
 					tmp[j] = tmp[j].replaceAll("\\.", "");
 				}
 
-				if (!(reachedEnd && isNumeric(tmp[j])) && isStopWord(tmp[j])) {
+				// (useStopList && isStopWord(tmp[j])
+				if (!(reachedEnd && isNumeric(tmp[j]))) {
 					numericCleanUp.append(tmp[j] + " ");
 					reachedEnd = false;
 				}
@@ -212,7 +219,7 @@ public class Parser {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param str
 	 * @return if the given string is a stop-word or not
 	 */

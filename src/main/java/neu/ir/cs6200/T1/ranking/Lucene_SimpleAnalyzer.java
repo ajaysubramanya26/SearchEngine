@@ -35,8 +35,9 @@ import com.google.common.io.Files;
 import neu.ir.cs6200.querydata.QueryDataReader;
 
 /**
- * To create Apache Lucene index in a folder and add files into this index based
- * on the input of the user.
+ * @author smitha
+ * @info To create Apache Lucene index in a folder and add files into this index
+ *       based on the input of the user.
  */
 public class Lucene_SimpleAnalyzer {
 	private static Analyzer analyzer = new SimpleAnalyzer(Version.LUCENE_47);

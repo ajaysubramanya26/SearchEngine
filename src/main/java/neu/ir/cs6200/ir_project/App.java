@@ -49,7 +49,7 @@ public class App {
 
 		// Parser.parseStmdCrps("data/cacm_stem.txt", 3204);
 
-		Parser.setUseStopList(true);
+		Parser.setUseStopList(false);
 		Parser.parseStore(CorpusDirLoc, ParsedDirName);
 		Tokenizer.tokenizeIndex(ParsedDirName, 1);
 
