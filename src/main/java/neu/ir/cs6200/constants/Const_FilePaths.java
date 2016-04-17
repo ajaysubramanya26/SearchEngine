@@ -20,5 +20,8 @@ public class Const_FilePaths {
 	public static final String Task3QueryResults = QueryResultsDir + "/" + "Task3";
 
 	public static final String Temp_IndexLucene = "./Temp_IndexLucene";
+	
+	public static final String CACM_RELEVANCE_FILE = "data/cacm.rel";
+	public static final String QUERY_RESULT_FILE_PATH = "Results/Query_Results/Task1/";
 
 }
