@@ -63,4 +63,8 @@ public class QueryEvaluationSummary {
 	public void setRankWisePrecisionRecall(List<EvaluationResult> rankWisePrecisionRecall) {
 		this.rankWisePrecisionRecall = rankWisePrecisionRecall;
 	}
+	
+	public EvaluationResult getResultAtRank(int rank) {
+		return this.rankWisePrecisionRecall.get(rank -1); 
+	}
 }

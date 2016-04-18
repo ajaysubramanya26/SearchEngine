@@ -83,32 +83,63 @@ public class SearchEngineEvaluator {
 		}
 		return relevanceGroundTruth;
 	}
-	
+
 	public void evaluate() {
-		Mode[] modes = new Mode[] {Mode.BM25, Mode.LUCENE, Mode.TFIDF};
-		for(Mode mode : modes) {
+		Mode[] modes = new Mode[] { Mode.BM25, Mode.LUCENE, Mode.TFIDF };
+		for (Mode mode : modes) {
 			double totalAveragePrecision = 0;
 			double totalReciprocalRank = 0;
-			for(int i=1; i<=64 ; i++) {
+			double totalPrecisionAtRank5 = 0;
+			double totalPrecisionAtRank20 = 0;
+
+			for (int i = 1; i <= 64; i++) {
 				QueryEvaluationSummary querySummary = evaluate(i, mode);
-				if(querySummary != null) {
+				if (querySummary != null) {
 					totalAveragePrecision += querySummary.getAveragePrecision();
 					totalReciprocalRank += (double) 1 / querySummary.getReciprocalRank();
+					totalPrecisionAtRank5 += querySummary.getResultAtRank(5).getPrecision();
+					totalPrecisionAtRank20 += querySummary.getResultAtRank(20).getPrecision();
 				}
- 			}
-			
+			}
+			writeResult(totalAveragePrecision, totalReciprocalRank, totalPrecisionAtRank5, totalPrecisionAtRank20, 64,
+					mode);
+		}
+	}
+
+	private void writeResult(double totalAveragePrecision, double totalReciprocalRank, double totalPrecisionAtRank5,
+			double totalPrecisionAtRank20, int queryCount, Mode mode) {
+		BufferedWriter writer = null;
+		try {
+			writer = new BufferedWriter(
+					new FileWriter(new File(Const_FilePaths.QUERY_EVALUATION_RESULT + mode.mode())));
+			writer.write("MAP : " + totalAveragePrecision / queryCount + "\n");
+			writer.write("MRR : " + totalReciprocalRank / queryCount + "\n");
+			writer.write("P @ K5 : " + totalPrecisionAtRank5 / queryCount + "\n");
+			writer.write("P @ K20 : " + totalPrecisionAtRank20 / queryCount + "\n");
+		} catch (IOException e) {
+			LOGGER.error(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			try {
+				writer.close();
+			} catch (IOException e) {
+				LOGGER.error(e.getMessage());
+				e.printStackTrace();
+			}
 		}
 	}
 
 	/**
 	 * Evaluates the search results for the given query.
+	 * 
 	 * @param queryId
 	 * @param mode
 	 */
 	private QueryEvaluationSummary evaluate(int queryId, Mode mode) {
 		List<String> searchResults = loadQuerySearchResult(queryId, mode);
 		Set<String> relevanceGroundTruth = this.relevanceGroundTruth.get(queryId);
-		if (relevanceGroundTruth.isEmpty()) {
+		if (relevanceGroundTruth == null || relevanceGroundTruth.isEmpty()) {
+			System.out.println("No ground truth found for query :" + queryId + " - " + mode.mode);
 			LOGGER.error("No ground truth found for query :" + queryId + " - " + mode.mode);
 			return null;
 		}
@@ -136,12 +167,12 @@ public class SearchEngineEvaluator {
 		writeRankWiseResults(result, queryId, mode);
 		double averagePrecision = relevantRankFound ? (double) totalPrecision / relevantCount : 0;
 		QueryEvaluationSummary summary = new QueryEvaluationSummary(averagePrecision, firstRelevantRank, result);
-		System.out.println("Doe");
 		return summary;
 	}
 
 	/**
 	 * Write the result.
+	 * 
 	 * @param result
 	 * @param queryId
 	 * @param mode
@@ -150,8 +181,8 @@ public class SearchEngineEvaluator {
 		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new FileWriter(
-					new File(getSearchResultFileName(Const_FilePaths.QUERY_EVALUATION_RESULT, queryId, mode))));
-			for(EvaluationResult evalResult : result) {
+					new File(getSearchResultFileName(Const_FilePaths.QUERY_EVALUATION_RESULT_TASK4, queryId, mode))));
+			for (EvaluationResult evalResult : result) {
 				writer.write(evalResult.toString() + "\n");
 			}
 		} catch (IOException e) {
@@ -169,6 +200,7 @@ public class SearchEngineEvaluator {
 
 	/**
 	 * Loads the search result for a given query.
+	 * 
 	 * @param queryId
 	 * @param mode
 	 *            retrieval model
@@ -217,6 +249,7 @@ public class SearchEngineEvaluator {
 
 	public static void main(String[] args) {
 		SearchEngineEvaluator eval = new SearchEngineEvaluator();
-		eval.evaluate(1, Mode.TFIDF);
+		eval.evaluate();
+		System.out.println("Done");
 	}
 }
