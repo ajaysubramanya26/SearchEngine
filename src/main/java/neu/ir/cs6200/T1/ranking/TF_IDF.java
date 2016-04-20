@@ -108,8 +108,7 @@ public class TF_IDF {
 	}
 
 	/**
-	 * Using inverse document frequency smooth for computing idf (1 +
-	 * log(N/n(t)))
+	 * Using inverse document frequency smooth for computing idf = log(N/n(t))
 	 *
 	 * @param qTerm
 	 * @param docId
@@ -119,12 +118,24 @@ public class TF_IDF {
 		double totalNumOfDocs = this.documentLenHm.size();
 		if (this.invertedLists.get(qTerm) != null) {
 			double numOfDocsQueryTermPresent = this.invertedLists.get(qTerm).size();
-			return (1 + Math.log(totalNumOfDocs / numOfDocsQueryTermPresent));
+			return (Math.log(totalNumOfDocs / numOfDocsQueryTermPresent));
 		} else {
 			return 0;
 		}
 	}
 
+	/**
+	 * Compute the TF-IDF score <br>
+	 * tf(t,d) = (1 + log(ft,d)) or zero if ft,d is zero; Reference :Wikipedia
+	 * <br>
+	 * idf = log(N/n(t)) <br>
+	 * Normalize by idf = Math.pow((1 + log(ft,d)) *log(N/n(t)), 2) and finally
+	 * taking log at the end of all query terms.
+	 *
+	 * @param queryStr
+	 * @param qNum
+	 * @param sysName
+	 */
 	private void computeTFIDFScore(String queryStr, int qNum, String sysName) {
 		HashMap<String, Double> rankScoreHm = new HashMap<>();
 
@@ -144,9 +155,17 @@ public class TF_IDF {
 		 */
 		for (String docId : queryDocs) {
 			double queryScore = 0.0;
+			double normalizationDenominator = 0.0;
 			for (String queryTerm : qTermFre.keySet()) {
-				queryScore += tfIDFScorePerDocumentPerQTerm(docId, queryTerm);
+				double score = tfIDFScorePerDocumentPerQTerm(docId, queryTerm);
+				queryScore += score;
+				normalizationDenominator += Math.pow(score, 2);
 			}
+			// double finalNormalization = Math.sqrt(normalizationDenominator);
+			// if (finalNormalization != 0.0) {
+			// rankScoreHm.put(docId, (queryScore /
+			// Math.sqrt(normalizationDenominator)));
+			// }
 			rankScoreHm.put(docId, queryScore);
 		}
 
