@@ -207,7 +207,9 @@ public class PseudoRevelance {
 			Map<String, Integer> sortedMap) {
 		File file = new File(Pseudo_Relevance + "/Q" + queryId);
 		logger.info("Raw Q Terms : " + qReader.getRaw_query(queryId));
-		logger.debug("All terms from top 20(collection set) docs found for a Q(sorted on TF) : " + sortedMap);
+		if (logger.isDebugEnabled()) {
+			logger.debug("All terms from top 20(collection set) docs found for a Q(sorted on TF) : " + sortedMap);
+		}
 		logger.info("Expanded Q Terms(without Raw Q terms) : " + kExpandedQueryTerms);
 		try {
 			Files.append(new StringBuilder(

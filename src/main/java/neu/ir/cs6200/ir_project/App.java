@@ -46,7 +46,6 @@ public class App {
 
 		String log4jConfPath = "./log4j.properties";
 		PropertyConfigurator.configure(log4jConfPath);
-		System.setProperty("logfilename", "ir_project_ask");
 
 		final Logger logger = Logger.getLogger(App.class);
 

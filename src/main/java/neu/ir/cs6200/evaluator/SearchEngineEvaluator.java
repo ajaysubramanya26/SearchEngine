@@ -130,8 +130,7 @@ public class SearchEngineEvaluator {
 		List<String> searchResults = QueryResultReader.loadQuerySearchResult(queryId, mode);
 		Set<String> relevanceGroundTruth = this.relevanceGroundTruth.get(queryId);
 		if (relevanceGroundTruth == null || relevanceGroundTruth.isEmpty()) {
-			System.out.println("No ground truth found for query :" + queryId + " - " + mode.mode);
-			LOGGER.error("No ground truth found for query :" + queryId + " - " + mode.mode);
+			LOGGER.warn("No ground truth found for query :" + queryId + " - " + mode.mode);
 			return null;
 		}
 		int totalRelevantDocuments = relevanceGroundTruth.size();
