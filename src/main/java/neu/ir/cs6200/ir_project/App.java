@@ -6,6 +6,8 @@ import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_Uni;
 import static neu.ir.cs6200.constants.Const_FilePaths.ParsedDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.QueryDataFname;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task1QueryResults;
+import static neu.ir.cs6200.constants.Consts.TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE;
+import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_RES_DOCS_PSEUDO_RELEVANCE;
 import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_SEARCH_RES;
 
 import java.io.File;
@@ -19,6 +21,8 @@ import neu.ir.cs6200.T1.parser.Parser;
 import neu.ir.cs6200.T1.ranking.BM25;
 import neu.ir.cs6200.T1.ranking.Lucene_SimpleAnalyzer;
 import neu.ir.cs6200.T1.ranking.TF_IDF;
+import neu.ir.cs6200.evaluator.Mode;
+import neu.ir.cs6200.querydata.PseudoRevelance;
 import neu.ir.cs6200.querydata.QueryDataReader;
 import neu.ir.cs6200.utils.FileUtils;
 
@@ -37,6 +41,7 @@ public class App {
 
 		String log4jConfPath = "./log4j.properties";
 		PropertyConfigurator.configure(log4jConfPath);
+		System.setProperty("logfilename", "ir_project_ask");
 
 		final Logger logger = Logger.getLogger(App.class);
 
@@ -61,6 +66,12 @@ public class App {
 		indexReader.deserializeDocumentsLength(DocLenFname);
 
 		runTask1_RawQueries(queryReader, indexReader);
+
+		PseudoRevelance pseudoRel = new PseudoRevelance(TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE);
+		pseudoRel.createExpandedQueries(Mode.BM25, queryReader, TOPN_QUERY_RES_DOCS_PSEUDO_RELEVANCE);
+
+		// SearchEngineEvaluator eval = new SearchEngineEvaluator();
+		// eval.evaluate();
 
 	}
 

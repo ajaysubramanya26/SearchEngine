@@ -3,6 +3,7 @@ package neu.ir.cs6200.constants;
 public class Const_FilePaths {
 
 	public static final String CorpusDirLoc = "data/cacm";
+	public static final String StopListLoc = "data/common_words";
 
 	public static final String Results = "Results";
 	public static final String InvertedIndexDirName = "Results" + "/" + "Indexer_Output";
@@ -20,9 +21,12 @@ public class Const_FilePaths {
 	public static final String Task3QueryResults = QueryResultsDir + "/" + "Task3";
 
 	public static final String Temp_IndexLucene = "./Temp_IndexLucene";
-	
+
 	public static final String CACM_RELEVANCE_FILE = "data/cacm.rel";
 	public static final String QUERY_RESULT_FILE_PATH = "Results/Query_Results/Task1/";
 	public static final String QUERY_EVALUATION_RESULT_TASK4 = "Results/Evaluation_Results/Task4/";
 	public static final String QUERY_EVALUATION_RESULT = "Results/Evaluation_Results/";
+
+	public static final String Expanded_QueryInfo = "Results" + "/" + "ExpandedQueries";
+	public static final String Pseudo_Relevance = Expanded_QueryInfo + "/" + "Pseudo_Relevance";
 }

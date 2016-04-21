@@ -32,6 +32,19 @@ public class QueryDataReader {
 		this.raw_queries = raw_queries;
 	}
 
+	/**
+	 * Returns the query string for the query id
+	 *
+	 * @param queryId
+	 * @return
+	 */
+	public String getRaw_query(Integer queryId) {
+		if (this.raw_queries != null) {
+			return this.raw_queries.get(queryId);
+		}
+		return null;
+	}
+
 	public void readQueryDocument(String filePath) {
 		try {
 			List<String> allLines = Files.readAllLines(Paths.get(filePath), StandardCharsets.UTF_8);

@@ -1,14 +1,19 @@
 package neu.ir.cs6200.utils;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 
 /**
  * Sort Utility
- * 
+ *
  * @author smitha
  *
  */
@@ -43,4 +48,37 @@ public class SortUtils {
 			return e2.compareTo(e1);
 		}
 	};
+
+	/**
+	 * Sorts HashMap by value
+	 *
+	 * @param map
+	 * @return
+	 * @info : http://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-
+	 *       values-java
+	 */
+	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map, boolean sortDescending) {
+		List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
+		if (!sortDescending) {
+			Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+				@Override
+				public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+					return (o1.getValue()).compareTo(o2.getValue());
+				}
+			});
+		} else {
+			Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+				@Override
+				public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+					return (o2.getValue()).compareTo(o1.getValue());
+				}
+			});
+		}
+
+		Map<K, V> result = new LinkedHashMap<>();
+		for (Map.Entry<K, V> entry : list) {
+			result.put(entry.getKey(), entry.getValue());
+		}
+		return result;
+	}
 }

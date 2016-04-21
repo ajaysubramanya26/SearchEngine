@@ -1,5 +1,7 @@
 package neu.ir.cs6200.T1.parser;
 
+import static neu.ir.cs6200.constants.Const_FilePaths.StopListLoc;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,7 +53,7 @@ public class Parser {
 		logger.info("In parseStore");
 
 		if (useStopList) {
-			getStopWords();
+			stopWords = getStopWords();
 			logger.info("using stop words list : " + getUseStopList());
 		}
 
@@ -229,15 +231,17 @@ public class Parser {
 
 	/**
 	 * retrieves the stop words from the provided file
+	 *
+	 * @return
 	 */
-	private static void getStopWords() {
+	public static String[] getStopWords() {
 		String stopWrdsFile = null;
 		try {
-			stopWrdsFile = org.apache.commons.io.FileUtils.readFileToString((new File("data/common_words")));
+			stopWrdsFile = org.apache.commons.io.FileUtils.readFileToString((new File(StopListLoc)));
 		} catch (IOException e) {
 			logger.error("Exception while reading stop list file + " + e.getMessage());
 		}
-		stopWords = stopWrdsFile.split("\n");
+		return stopWrdsFile.split("\n");
 	}
 
 	public static Boolean getUseStopList() {

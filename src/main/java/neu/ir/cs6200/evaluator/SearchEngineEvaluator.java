@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package neu.ir.cs6200.evaluator;
 
@@ -19,6 +19,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import neu.ir.cs6200.constants.Const_FilePaths;
+import neu.ir.cs6200.querydata.QueryResultReader;
+import neu.ir.cs6200.utils.FileUtils;
 
 /**
  * @author kamlendra
@@ -26,21 +28,6 @@ import neu.ir.cs6200.constants.Const_FilePaths;
  * @author Ajay
  */
 public class SearchEngineEvaluator {
-
-	enum Mode {
-
-		BM25("BM25"), TFIDF("TFIDF"), LUCENE("Lucene");
-
-		private final String mode;
-
-		private Mode(String mode) {
-			this.mode = mode;
-		}
-
-		public String mode() {
-			return this.mode;
-		}
-	}
 
 	private Map<Integer, Set<String>> relevanceGroundTruth;
 
@@ -52,7 +39,7 @@ public class SearchEngineEvaluator {
 
 	/**
 	 * Loads the relevance ground truth for evaluation.
-	 * 
+	 *
 	 * @return
 	 */
 	private Map<Integer, Set<String>> loadGroundTruth() {
@@ -85,6 +72,10 @@ public class SearchEngineEvaluator {
 	}
 
 	public void evaluate() {
+
+		FileUtils.deleteFolder(Const_FilePaths.QUERY_EVALUATION_RESULT_TASK4);
+		FileUtils.createDirectory(Const_FilePaths.QUERY_EVALUATION_RESULT_TASK4);
+
 		Mode[] modes = new Mode[] { Mode.BM25, Mode.LUCENE, Mode.TFIDF };
 		for (Mode mode : modes) {
 			double totalAveragePrecision = 0;
@@ -131,12 +122,12 @@ public class SearchEngineEvaluator {
 
 	/**
 	 * Evaluates the search results for the given query.
-	 * 
+	 *
 	 * @param queryId
 	 * @param mode
 	 */
 	private QueryEvaluationSummary evaluate(int queryId, Mode mode) {
-		List<String> searchResults = loadQuerySearchResult(queryId, mode);
+		List<String> searchResults = QueryResultReader.loadQuerySearchResult(queryId, mode);
 		Set<String> relevanceGroundTruth = this.relevanceGroundTruth.get(queryId);
 		if (relevanceGroundTruth == null || relevanceGroundTruth.isEmpty()) {
 			System.out.println("No ground truth found for query :" + queryId + " - " + mode.mode);
@@ -165,14 +156,14 @@ public class SearchEngineEvaluator {
 			result.add(new EvaluationResult(i + 1, precision, recall));
 		}
 		writeRankWiseResults(result, queryId, mode);
-		double averagePrecision = relevantRankFound ? (double) totalPrecision / relevantCount : 0;
+		double averagePrecision = relevantRankFound ? totalPrecision / relevantCount : 0;
 		QueryEvaluationSummary summary = new QueryEvaluationSummary(averagePrecision, firstRelevantRank, result);
 		return summary;
 	}
 
 	/**
 	 * Write the result.
-	 * 
+	 *
 	 * @param result
 	 * @param queryId
 	 * @param mode
@@ -180,8 +171,8 @@ public class SearchEngineEvaluator {
 	private void writeRankWiseResults(List<EvaluationResult> result, int queryId, Mode mode) {
 		BufferedWriter writer = null;
 		try {
-			writer = new BufferedWriter(new FileWriter(
-					new File(getSearchResultFileName(Const_FilePaths.QUERY_EVALUATION_RESULT_TASK4, queryId, mode))));
+			writer = new BufferedWriter(new FileWriter(new File(QueryResultReader
+					.getSearchResultFileName(Const_FilePaths.QUERY_EVALUATION_RESULT_TASK4, queryId, mode))));
 			for (EvaluationResult evalResult : result) {
 				writer.write(evalResult.toString() + "\n");
 			}
@@ -198,58 +189,9 @@ public class SearchEngineEvaluator {
 		}
 	}
 
-	/**
-	 * Loads the search result for a given query.
-	 * 
-	 * @param queryId
-	 * @param mode
-	 *            retrieval model
-	 * @return
-	 */
-	private List<String> loadQuerySearchResult(int queryId, Mode mode) {
-		List<String> searchResults = new ArrayList<String>();
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new FileReader(
-					new File(getSearchResultFileName(Const_FilePaths.QUERY_RESULT_FILE_PATH, queryId, mode))));
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				String document = line.split("\\s")[2];
-				searchResults.add(document);
-			}
-		} catch (IOException e) {
-			LOGGER.error(e.getMessage());
-			e.printStackTrace();
-		} finally {
-			try {
-				reader.close();
-			} catch (IOException e) {
-				LOGGER.error(e.getMessage());
-				e.printStackTrace();
-			}
-		}
-		return searchResults;
-	}
-
-	/**
-	 * Forms the result file name to be read for evaluations.
-	 * 
-	 * @param queryId
-	 * @param mode
-	 * @return
-	 */
-	private String getSearchResultFileName(String folderPath, int queryId, Mode mode) {
-		StringBuilder builder = new StringBuilder(folderPath);
-		builder.append("Q");
-		builder.append(queryId);
-		builder.append("_");
-		builder.append(mode.mode());
-		return builder.toString();
-	}
-
-	public static void main(String[] args) {
-		SearchEngineEvaluator eval = new SearchEngineEvaluator();
-		eval.evaluate();
-		System.out.println("Done");
-	}
+	// public static void main(String[] args) {
+	// SearchEngineEvaluator eval = new SearchEngineEvaluator();
+	// eval.evaluate();
+	// System.out.println("Done");
+	// }
 }

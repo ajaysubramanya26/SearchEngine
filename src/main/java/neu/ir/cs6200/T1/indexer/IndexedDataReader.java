@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -157,4 +158,25 @@ public class IndexedDataReader {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * Get top in words(stopwords) front the term frequency file
+	 *
+	 * @param filePath
+	 * @param topNStopWords
+	 * @return
+	 */
+	public static List<String> getStopWords_TermFrequencyFile(String filePath, int topNStopWords) {
+		List<String> stopWords = new ArrayList<>();
+		try {
+			List<String> rawTF = Files.readAllLines(Paths.get(filePath), StandardCharsets.UTF_8);
+			for (int i = 0; i < topNStopWords; i++) {
+				stopWords.add(rawTF.get(i).split(":")[0]);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return stopWords;
+	}
+
 }
