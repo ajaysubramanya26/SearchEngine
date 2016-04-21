@@ -76,7 +76,7 @@ public class SearchEngineEvaluator {
 		FileUtils.deleteFolder(Const_FilePaths.QUERY_EVALUATION_RESULT_TASK4);
 		FileUtils.createDirectory(Const_FilePaths.QUERY_EVALUATION_RESULT_TASK4);
 
-		Mode[] modes = new Mode[] { Mode.BM25, Mode.LUCENE, Mode.TFIDF };
+		Mode[] modes = new Mode[] { Mode.BM25, Mode.LUCENE, Mode.TFIDF, Mode.PSEUDO_REL_QE };
 		for (Mode mode : modes) {
 			double totalAveragePrecision = 0;
 			double totalReciprocalRank = 0;

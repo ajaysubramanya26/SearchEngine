@@ -6,6 +6,9 @@ import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_Uni;
 import static neu.ir.cs6200.constants.Const_FilePaths.ParsedDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.QueryDataFname;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task1QueryResults;
+import static neu.ir.cs6200.constants.Const_FilePaths.Task2QueryResults;
+import static neu.ir.cs6200.constants.Consts.BM25PseudoRel_Fname;
+import static neu.ir.cs6200.constants.Consts.BM25_FName;
 import static neu.ir.cs6200.constants.Consts.TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE;
 import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_RES_DOCS_PSEUDO_RELEVANCE;
 import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_SEARCH_RES;
@@ -21,7 +24,9 @@ import neu.ir.cs6200.T1.parser.Parser;
 import neu.ir.cs6200.T1.ranking.BM25;
 import neu.ir.cs6200.T1.ranking.Lucene_SimpleAnalyzer;
 import neu.ir.cs6200.T1.ranking.TF_IDF;
+import neu.ir.cs6200.constants.Consts;
 import neu.ir.cs6200.evaluator.Mode;
+import neu.ir.cs6200.evaluator.SearchEngineEvaluator;
 import neu.ir.cs6200.querydata.PseudoRevelance;
 import neu.ir.cs6200.querydata.QueryDataReader;
 import neu.ir.cs6200.utils.FileUtils;
@@ -67,11 +72,12 @@ public class App {
 
 		runTask1_RawQueries(queryReader, indexReader);
 
-		PseudoRevelance pseudoRel = new PseudoRevelance(TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE);
-		pseudoRel.createExpandedQueries(Mode.BM25, queryReader, TOPN_QUERY_RES_DOCS_PSEUDO_RELEVANCE);
+		runTask2_QueryExpansion(queryReader, indexReader);
 
-		// SearchEngineEvaluator eval = new SearchEngineEvaluator();
-		// eval.evaluate();
+		SearchEngineEvaluator eval = new SearchEngineEvaluator();
+		eval.evaluate();
+
+		logger.info("Done");
 
 	}
 
@@ -89,8 +95,8 @@ public class App {
 
 		FileUtils.createDirectory(Task1QueryResults);
 
-		BM25 bm25 = new BM25(1.2, 0.75, 100, TOPN_QUERY_SEARCH_RES, Task1QueryResults);
-		bm25.runBM25(queryReader.getRaw_queries(), indexReader);
+		BM25 bm25 = new BM25(Consts.k1, Consts.b, Consts.k2, TOPN_QUERY_SEARCH_RES, Task1QueryResults);
+		bm25.runBM25(queryReader.getRaw_queries(), indexReader, BM25_FName);
 
 		Lucene_SimpleAnalyzer.runLucene(queryReader, ParsedDirName, Task1QueryResults);
 
@@ -98,4 +104,22 @@ public class App {
 		tfidf.runTFIDF(queryReader.getRaw_queries(), indexReader);
 	}
 
+	/**
+	 * Use Query Expansion techniques to get expanded query terms. <br>
+	 * Then use BM25 to get rank on expanded query.<br>
+	 *
+	 *
+	 * @param queryReader
+	 * @param indexReader
+	 */
+	public static void runTask2_QueryExpansion(QueryDataReader queryReader, IndexedDataReader indexReader) {
+		FileUtils.createDirectory(Task2QueryResults);
+
+		PseudoRevelance pseudoRel = new PseudoRevelance(TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE);
+		pseudoRel.createExpandedQueries(Mode.BM25, queryReader, TOPN_QUERY_RES_DOCS_PSEUDO_RELEVANCE);
+
+		BM25 bm25 = new BM25(Consts.k1, Consts.b, Consts.k2, TOPN_QUERY_SEARCH_RES, Task2QueryResults);
+		bm25.runBM25(pseudoRel.getExpPseudoRel_queries(), indexReader, BM25PseudoRel_Fname);
+
+	}
 }

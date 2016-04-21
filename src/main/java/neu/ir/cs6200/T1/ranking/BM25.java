@@ -123,8 +123,9 @@ public class BM25 {
 	 * Outputs the list of top 100 ranked documents for a given query using BM25
 	 *
 	 * @param queryStr
+	 * @param fileNameAppender
 	 */
-	public void searchBM25(String queryStr, int qNum, String sysName) {
+	public void searchBM25(String queryStr, int qNum, String sysName, String fileNameAppender) {
 
 		HashMap<String, Double> rankScoreHm = new HashMap<>();
 
@@ -151,7 +152,7 @@ public class BM25 {
 			rankScoreHm.put(docId, queryScore);
 		}
 
-		writeTopNDocsBM25Score(rankScoreHm, qNum, sysName);
+		writeTopNDocsBM25Score(rankScoreHm, qNum, sysName, fileNameAppender);
 	}
 
 	/**
@@ -160,13 +161,15 @@ public class BM25 {
 	 * @param rankScoreHm
 	 * @param qNum
 	 * @param sysName
+	 * @param fileNameAppender
 	 */
-	private void writeTopNDocsBM25Score(HashMap<String, Double> rankScoreHm, int qNum, String sysName) {
+	private void writeTopNDocsBM25Score(HashMap<String, Double> rankScoreHm, int qNum, String sysName,
+			String fileNameAppender) {
 		ListMultimap<Double, String> sortedRanks = SortUtils.sortMostToLeastScore(rankScoreHm);
 		int topRanked = 1;
 
 		try {
-			File fileQResBM25 = new File(this.queryResultDir + "/Q" + qNum + "_BM25");
+			File fileQResBM25 = new File(this.queryResultDir + "/Q" + qNum + "_" + fileNameAppender);
 
 			for (Double rankScore : sortedRanks.keySet()) {
 				List<String> docIds = sortedRanks.get(rankScore);
@@ -239,7 +242,7 @@ public class BM25 {
 		return first * second * third;
 	}
 
-	public void runBM25(HashMap<Integer, String> queries, IndexedDataReader indexReader) {
+	public void runBM25(HashMap<Integer, String> queries, IndexedDataReader indexReader, String fileNameAppender) {
 		logger.info("Running BM25");
 
 		this.setInvertedLists(indexReader.getInvertedLists());
@@ -249,7 +252,7 @@ public class BM25 {
 				+ this.totalDocLenCorpus);
 		for (int qNum : queries.keySet()) {
 			logger.debug("Running BM25 ranking for query :" + queries.get(qNum));
-			this.searchBM25(queries.get(qNum), qNum, IR_SystemName);
+			this.searchBM25(queries.get(qNum), qNum, IR_SystemName, fileNameAppender);
 			logger.debug("");
 		}
 	}

@@ -1,5 +1,8 @@
 package neu.ir.cs6200.querydata;
 
+import static neu.ir.cs6200.constants.Const_FilePaths.Task1QueryResults;
+import static neu.ir.cs6200.constants.Const_FilePaths.Task2QueryResults;
+import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryResults;
 import static neu.ir.cs6200.constants.Consts.DOCID_INDEX_QUERY_RESULT;
 
 import java.io.BufferedReader;
@@ -11,7 +14,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import neu.ir.cs6200.constants.Const_FilePaths;
 import neu.ir.cs6200.evaluator.Mode;
 
 /**
@@ -33,8 +35,8 @@ public class QueryResultReader {
 		List<String> searchResults = new ArrayList<String>();
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new FileReader(
-					new File(getSearchResultFileName(Const_FilePaths.QUERY_RESULT_FILE_PATH, queryId, mode))));
+			String dirPath = getDirectoryPath(mode) + "/";
+			reader = new BufferedReader(new FileReader(new File(getSearchResultFileName(dirPath, queryId, mode))));
 			String line = null;
 			while ((line = reader.readLine()) != null) {
 				String document = line.split("\\s")[DOCID_INDEX_QUERY_RESULT];
@@ -52,6 +54,25 @@ public class QueryResultReader {
 			}
 		}
 		return searchResults;
+	}
+
+	/**
+	 * Since different tables are written under different directories get the
+	 * directory associated with the mode.
+	 *
+	 * @param mode
+	 * @return
+	 */
+	private static String getDirectoryPath(Mode mode) {
+
+		if (mode == Mode.BM25 || mode == Mode.LUCENE || mode == Mode.TFIDF) {
+			return Task1QueryResults;
+		} else if (mode == Mode.PSEUDO_REL_QE || mode == Mode.QE2) {
+			return Task2QueryResults;
+		} else if (mode == Mode.STOPPING || mode == Mode.T7) {
+			return Task3QueryResults;
+		}
+		return null;
 	}
 
 	/**

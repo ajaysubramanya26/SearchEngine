@@ -49,6 +49,15 @@ public class PseudoRevelance {
 	}
 
 	/**
+	 * Get HashMap of Expanded Queries
+	 *
+	 * @return
+	 */
+	public HashMap<Integer, String> getExpPseudoRel_queries() {
+		return expPseudoRel_queries;
+	}
+
+	/**
 	 * Returns top N Query Results out of Query Results
 	 *
 	 * @param queryId
@@ -56,7 +65,7 @@ public class PseudoRevelance {
 	 * @param topN
 	 * @return
 	 */
-	public List<String> getTopNQueryResultDocs(int queryId, Mode mode, int topNQueryDocs) {
+	private List<String> getTopNQueryResultDocs(int queryId, Mode mode, int topNQueryDocs) {
 
 		List<String> queryResTopN = new ArrayList<>();
 		List<String> queryRes = QueryResultReader.loadQuerySearchResult(queryId, mode);
@@ -79,7 +88,7 @@ public class PseudoRevelance {
 
 	/**
 	 * Runs pseudo relevance on each of the raw query to get expanded queries
-	 * 
+	 *
 	 * @param mode
 	 * @param queryReader
 	 * @param topnQueryResDocsPseudoRelevance
@@ -99,7 +108,7 @@ public class PseudoRevelance {
 	 * @param dfHmRelevanceDocs
 	 * @param tfHmRelevanceDocs
 	 */
-	public boolean buildTermFrequencyRevelanceDocs(List<String> docIds, boolean removeStopWords,
+	private boolean buildTermFrequencyRevelanceDocs(List<String> docIds, boolean removeStopWords,
 			Map<String, Integer> tfHmRelevanceDocs, Map<String, Integer> dfHmRelevanceDocs) {
 
 		if (docIds == null || docIds.size() == 0) {
@@ -151,7 +160,7 @@ public class PseudoRevelance {
 	 * @param removeStopWords
 	 * @return
 	 */
-	public void getExpandedQueryTerms(int queryId, Mode mode, int topNQueryDocs, boolean removeStopWords,
+	private void getExpandedQueryTerms(int queryId, Mode mode, int topNQueryDocs, boolean removeStopWords,
 			QueryDataReader qReader) {
 
 		Map<String, Integer> tfHmRelevanceDocs = new HashMap<>();
@@ -169,7 +178,7 @@ public class PseudoRevelance {
 		}
 		Map<String, Integer> sortedMap = SortUtils.sortByValue(tfHmRelevanceDocs, true);
 
-		// TODO : Scoring function
+		// TODO : Advanced Scoring function
 		int num = 0;
 		List<String> rawQueryTerms = Arrays.asList(qReader.getRaw_query(queryId).split("\\s"));
 		for (String term : sortedMap.keySet()) {
@@ -196,19 +205,19 @@ public class PseudoRevelance {
 	 */
 	private void writeToFile(int queryId, Mode mode, QueryDataReader qReader, String kExpandedQueryTerms,
 			Map<String, Integer> sortedMap) {
-		File file = new File(Pseudo_Relevance + "/" + queryId);
-		logger.info("Raw Q Terms:" + qReader.getRaw_query(queryId));
-		logger.info("All terms from top 20(collection set) docs found for a Q(sorted on TF) :" + sortedMap);
-		logger.info("Expanded Q Terms(without Raw Q terms) :" + kExpandedQueryTerms);
+		File file = new File(Pseudo_Relevance + "/Q" + queryId);
+		logger.info("Raw Q Terms : " + qReader.getRaw_query(queryId));
+		logger.debug("All terms from top 20(collection set) docs found for a Q(sorted on TF) : " + sortedMap);
+		logger.info("Expanded Q Terms(without Raw Q terms) : " + kExpandedQueryTerms);
 		try {
 			Files.append(new StringBuilder(
-					"\nFor query " + queryId + " " + mode + "\nRaw query terms:" + qReader.getRaw_query(queryId)), file,
-					Charsets.UTF_8);
+					"\nFor query " + queryId + " Mode " + mode + "\nRaw query terms : " + qReader.getRaw_query(queryId))
+					+ "\n\n", file, Charsets.UTF_8);
 			Files.append(
-					new StringBuilder(
-							"All terms from top 20(collection set) docs found for a query(sorted on TF) :" + sortedMap),
+					new StringBuilder("All terms from top 20(collection set) docs found for a query(sorted on TF) :"
+							+ sortedMap + "\n\n"),
 					file, Charsets.UTF_8);
-			Files.append(new StringBuilder("Expanded Q Terms(without Raw Q terms) :" + kExpandedQueryTerms), file,
+			Files.append(new StringBuilder("Expanded Q Terms(without Raw Q terms) : " + kExpandedQueryTerms), file,
 					Charsets.UTF_8);
 
 		} catch (IOException e) {
