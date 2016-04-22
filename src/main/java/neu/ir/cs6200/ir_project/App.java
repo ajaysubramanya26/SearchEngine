@@ -4,9 +4,11 @@ import static neu.ir.cs6200.constants.Const_FilePaths.CorpusDirLoc;
 import static neu.ir.cs6200.constants.Const_FilePaths.DocLenFname;
 import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_Uni;
 import static neu.ir.cs6200.constants.Const_FilePaths.ParsedDirName;
+import static neu.ir.cs6200.constants.Const_FilePaths.ParsedDirNameNoStopWords;
 import static neu.ir.cs6200.constants.Const_FilePaths.QueryDataFname;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task1QueryResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task2QueryResults;
+import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryResults;
 import static neu.ir.cs6200.constants.Consts.BM25PseudoRel_Fname;
 import static neu.ir.cs6200.constants.Consts.BM25_FName;
 import static neu.ir.cs6200.constants.Consts.TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE;
@@ -26,7 +28,6 @@ import neu.ir.cs6200.T1.ranking.Lucene_SimpleAnalyzer;
 import neu.ir.cs6200.T1.ranking.TF_IDF;
 import neu.ir.cs6200.constants.Consts;
 import neu.ir.cs6200.evaluator.Mode;
-import neu.ir.cs6200.evaluator.SearchEngineEvaluator;
 import neu.ir.cs6200.querydata.PseudoRevelance;
 import neu.ir.cs6200.querydata.QueryDataReader;
 import neu.ir.cs6200.utils.FileUtils;
@@ -56,15 +57,12 @@ public class App {
 			return;
 		}
 
-		// Parser.parseStmdCrps("data/cacm_stem.txt", 3204);
-
 		Parser.setUseStopList(false);
 		Parser.parseStore(CorpusDirLoc, ParsedDirName);
 		Tokenizer.tokenizeIndex(ParsedDirName, 1);
 
 		QueryDataReader queryReader = new QueryDataReader();
 		queryReader.readQueryDocument(QueryDataFname);
-
 		IndexedDataReader indexReader = new IndexedDataReader();
 		indexReader.deserializeInvertedIndex(InvertedIndexFName_Uni);
 		indexReader.deserializeDocumentsLength(DocLenFname);
@@ -73,8 +71,25 @@ public class App {
 
 		runTask2_QueryExpansion(queryReader, indexReader);
 
-		SearchEngineEvaluator eval = new SearchEngineEvaluator();
-		eval.evaluate();
+		// TODO : SMITHA THIS IS THE PART FROM TASK 3A
+		// Parser.setUseStopList(true);
+		// Parser.parseStore(CorpusDirLoc, ParsedDirNameNoStopWords);
+		// Tokenizer.tokenizeIndexForStopWrds(ParsedDirNameNoStopWords, 1);
+		//
+		// queryReader.readStemmedQueryDocument(StemmedQueryDataFname);
+		// indexReader.deserializeInvertedIndex(InvertedIndexNoStopWrdsDirName);
+		// indexReader.deserializeDocumentsLength(DocLenNoStopWordsFname);
+		//
+		// runTask3_RawQueries(queryReader, indexReader);
+
+		// this is for stemmed corpus
+
+		// Parser.setUseStopList(false);
+		// int numberOfStemmedDocs = 3204;
+		// Parser.parseStmdCrps(StemmedCorpus, numberOfStemmedDocs);
+
+		// SearchEngineEvaluator eval = new SearchEngineEvaluator();
+		// eval.evaluate();
 
 		logger.info("Done");
 
@@ -120,5 +135,25 @@ public class App {
 		BM25 bm25 = new BM25(Consts.k1, Consts.b, Consts.k2, TOPN_QUERY_SEARCH_RES, Task2QueryResults);
 		bm25.runBM25(pseudoRel.getExpPseudoRel_queries(), indexReader, BM25PseudoRel_Fname);
 
+	}
+
+	/**
+	 * TASK 3a
+	 * 
+	 * @param queryReader
+	 * @param indexReader
+	 */
+	public static void runTask3_RawQueries(QueryDataReader queryReader, IndexedDataReader indexReader) {
+		System.out.println("running task 3");
+
+		FileUtils.createDirectory(Task3QueryResults);
+
+		BM25 bm25 = new BM25(Consts.k1, Consts.b, Consts.k2, TOPN_QUERY_SEARCH_RES, Task3QueryResults);
+		bm25.runBM25(queryReader.getRaw_queries(), indexReader, BM25_FName);
+
+		Lucene_SimpleAnalyzer.runLucene(queryReader, ParsedDirNameNoStopWords, Task3QueryResults);
+
+		TF_IDF tfidf = new TF_IDF(TOPN_QUERY_SEARCH_RES, Task3QueryResults);
+		tfidf.runTFIDF(queryReader.getRaw_queries(), indexReader);
 	}
 }

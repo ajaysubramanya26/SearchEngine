@@ -73,6 +73,7 @@ public class IndexedDataReader {
 	 */
 	public void deserializeInvertedIndex(String filePath) {
 		try {
+			System.out.println("file path" + filePath);
 			List<String> rawInvertedList = Files.readAllLines(Paths.get(filePath), StandardCharsets.UTF_8);
 			if (rawInvertedList.size() != 0) {
 				for (String termDocIds : rawInvertedList) {
@@ -108,7 +109,7 @@ public class IndexedDataReader {
 				}
 			}
 			logger.info("Number of Lines Read from File:" + rawInvertedList.size() + " Number of entries in HashMap:"
-					+ invertedLists.size());
+			        + invertedLists.size());
 
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -1,11 +1,17 @@
 package neu.ir.cs6200.T1.indexer;
 
 import static neu.ir.cs6200.constants.Const_FilePaths.DocLenFname;
+import static neu.ir.cs6200.constants.Const_FilePaths.DocLenNoStopWordsFname;
 import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexDirName;
+import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFNameNoStpWrds;
 import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_DF;
+import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_No_StpWrds_DF;
+import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_No_StpWrds_TF;
 import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_TF;
 import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_Uni;
+import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexNoStopWrdsDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirName;
+import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirNameNoStopWrds;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +57,7 @@ public class Tokenizer {
 			listOfFiles = parserFolder.listFiles();
 			InvertedIndex indexer = new InvertedIndex();
 			for (File file : listOfFiles) {
-				/*Read File*/
+				/* Read File */
 				StringBuilder docContents = new StringBuilder();
 				try {
 					List<String> lines = Files.readLines(file, Charsets.UTF_8);
@@ -69,6 +75,40 @@ public class Tokenizer {
 			indexer.storeTermFrequency(indexer.invertedIndex, InvertedIndexFName_TF + "_N" + N);
 			indexer.storeDocFrequencyPerTerm(indexer.invertedIndex, InvertedIndexFName_DF + "_N" + N);
 
+		}
+	}
+
+	public static void tokenizeIndexForStopWrds(String parserOutput, int N) {
+
+		logger.info("In tokenizeIndex");
+		FileUtils.deleteFolder(TokenizerDirNameNoStopWrds);
+		FileUtils.createDirectory(TokenizerDirNameNoStopWrds);
+		FileUtils.deleteFolder(InvertedIndexNoStopWrdsDirName);
+		FileUtils.createDirectory(InvertedIndexNoStopWrdsDirName);
+
+		File parserFolder = new File(parserOutput);
+		File[] listOfFiles = null;
+		if (parserFolder.isDirectory()) {
+			listOfFiles = parserFolder.listFiles();
+			InvertedIndex indexer = new InvertedIndex();
+			for (File file : listOfFiles) {
+				/* Read File */
+				StringBuilder docContents = new StringBuilder();
+				try {
+					List<String> lines = Files.readLines(file, Charsets.UTF_8);
+					for (String eachLine : lines) {
+						docContents.append(eachLine);
+						docContents.append(" ");
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				tokenizeInvertedIndexStopList(docContents, file.getName().replaceAll(".txt", ""), indexer, N);
+			}
+
+			indexer.storeInvertedIndex(indexer.invertedIndex, InvertedIndexFNameNoStpWrds);
+			indexer.storeTermFrequency(indexer.invertedIndex, InvertedIndexFName_No_StpWrds_TF + "_N" + N);
+			indexer.storeDocFrequencyPerTerm(indexer.invertedIndex, InvertedIndexFName_No_StpWrds_DF + "_N" + N);
 		}
 	}
 
@@ -94,6 +134,41 @@ public class Tokenizer {
 		default:
 			logger.error("Not supported for N " + N);
 		}
+	}
+
+	public static void tokenizeInvertedIndexStopList(StringBuilder sb, String docId, InvertedIndex indexer, int N) {
+		String[] raw_words = sb.toString().split("[\\s]+");
+
+		switch (N) {
+		case 1:
+			HashMap<String, Long> hm = new HashMap<>();
+			termFrequencyFileN1(raw_words, hm);
+			storeTokensEachDocStopWrds(docId, TokenizerDirNameNoStopWrds, hm);
+			indexer.addToInvertedIndex(hm, indexer.invertedIndex, docId);
+			break;
+
+		default:
+			logger.error("Not supported for N " + N);
+		}
+	}
+
+	private static void storeTokensEachDocStopWrds(String docId, String dirName, HashMap<String, Long> hm) {
+
+		File file = new File(dirName + "/" + docId);
+		File fileDocLen = new File(DocLenNoStopWordsFname);
+		int docLen = 0;
+		try {
+
+			for (String word : hm.keySet()) {
+				docLen += hm.get(word);
+				Files.append(new StringBuilder(word + "," + hm.get(word) + "\n"), file, Charsets.UTF_8);
+			}
+
+			Files.append(new StringBuilder(docId + "," + docLen + "\n"), fileDocLen, Charsets.UTF_8);
+		} catch (IOException e) {
+			logger.error("Tokenizer and DocLen Files not created", e);
+		}
+
 	}
 
 	/**

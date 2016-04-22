@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -100,7 +102,12 @@ public class Parser {
 	 */
 	public static void parseStmdCrps(String dir, int numDocs) {
 		Map<Integer, String> stemmed = new HashMap<>();
+		Map<String, Integer> docIdNumTokens = new HashMap<>();
+		Map<String, Map<String, Integer>> uniGram = new HashMap<>();
+		ArrayList<String> tokens;
+
 		String corpus = null;
+
 		try {
 			corpus = org.apache.commons.io.FileUtils.readFileToString(new File(dir));
 		} catch (IOException e) {
@@ -111,10 +118,103 @@ public class Parser {
 			int start = i;
 			int end = start + 1;
 			String record = i != numDocs ? StringUtils.substringBetween(corpus, "# " + start, "# " + end)
-					: StringUtils.substringAfter(corpus, "# " + i);
-			stemmed.put(i, clean(record));
+			        : StringUtils.substringAfter(corpus, "# " + i);
+			stemmed.put(i, textCleanUp(clean(record)).toString());
 		}
 
+		for (int i : stemmed.keySet()) {
+			tokens = new ArrayList<String>();
+			String fileName = Integer.toString(i);
+			String content = stemmed.get(i);
+
+			tokens = getTokensInFile(content);
+
+			int numTokens = tokens.size();
+
+			docIdNumTokens.put(fileName, numTokens);
+
+			for (int j = 0; j < numTokens; j++) {
+				String token = tokens.get(j).toLowerCase().trim();
+				if (isValid(token)) addToTable(token, fileName, uniGram);
+			}
+		}
+
+		logger.info("index size " + uniGram.size());
+
+	}
+
+	/**
+	 * 
+	 * @param content
+	 *            the filtered HTML page contents
+	 * @return a list of tokens in the given page
+	 */
+	private static ArrayList<String> getTokensInFile(String content) {
+		ArrayList<String> tk = new ArrayList<String>();
+		String lines[] = content.split("\\r?\\n");
+		for (int j = 0; j < lines.length; j++) {
+			String[] tkns = lines[j].split(" +");
+			for (String t : tkns) {
+				tk.add(applyRegex(t));
+			}
+		}
+		return tk;
+	}
+
+	/**
+	 * applies a set of regex rules to the given token to validate it
+	 * 
+	 * @param token
+	 *            a string that needs to be validated
+	 * @return the token after regex'n it
+	 */
+	private static String applyRegex(String token) {
+		if (StringUtils.isNumeric(token)) return token;
+		Pattern regex = Pattern.compile("^[0-9]+([,.][0-9]+)?$");
+		Matcher matcher = regex.matcher(token);
+		if (matcher.find()) return token;
+		return token.replaceAll("(?![-])\\p{Punct}", "");
+	}
+
+	/**
+	 * performs further checks on the data
+	 * 
+	 * @param token
+	 *            the string which needs to be validated
+	 * @return
+	 */
+	private static boolean isValid(String token) {
+		if (token.equals("-")) return false;
+		if (token.equals(",")) return false;
+		if (token.trim().isEmpty()) return false;
+
+		return true;
+	}
+
+	/**
+	 * adds the given token and doc Id to the HashMap after performing minor
+	 * checks
+	 * 
+	 * @param token
+	 *            the [uni|bi|tri]gram term
+	 * @param docId
+	 *            the document in which the token is present
+	 * @param index
+	 *            [uniGram|biGram|triGram]
+	 */
+	private static void addToTable(String token, String docId, Map<String, Map<String, Integer>> index) {
+		if (index.containsKey(token)) {
+			if (index.get(token).containsKey(docId)) {
+				int tf = index.get(token).get(docId) + 1;
+				index.get(token).put(docId, tf);
+			} else {
+				index.get(token).put(docId, 1);
+			}
+		} else {
+			Map<String, Integer> temp = new HashMap<>();
+			temp.put(docId, 1);
+			index.put(token, temp);
+		}
 	}
 
 	/**
@@ -144,7 +244,7 @@ public class Parser {
 
 			for (int j = 0; j < tmp.length; j++) {
 				if (!isNumeric(tmp[j]) && ((tmp[j].contains(".") && !(tmp[j].endsWith(".") && tmp[j].length() == 2))
-						|| tmp[j].contains(","))) {
+				        || tmp[j].contains(","))) {
 					tmp[j] = tmp[j].replaceAll("\\,", "");
 					tmp[j] = tmp[j].replaceAll("\\.", "");
 				}
@@ -174,7 +274,7 @@ public class Parser {
 	 */
 	private static String cleanFileName(File file) {
 		return file.getName().replaceAll(".html", ".txt").replaceAll("_", "").replaceAll("-", "").replaceAll("\\(", "")
-				.replaceAll("\\)", "").replaceAll(",", "");
+		        .replaceAll("\\)", "").replaceAll(",", "");
 	}
 
 	/**

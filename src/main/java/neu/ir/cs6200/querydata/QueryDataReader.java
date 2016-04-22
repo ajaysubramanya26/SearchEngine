@@ -1,5 +1,6 @@
 package neu.ir.cs6200.querydata;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -7,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import neu.ir.cs6200.T1.parser.Parser;
@@ -70,7 +72,7 @@ public class QueryDataReader {
 
 				if (startDoc && docNum.startsWith("<DOCNO>") && docNum.endsWith("</DOCNO>")) {
 					qNum = Integer
-							.parseInt(docNum.substring(sNum, docNum.indexOf("</DOCNO>")).trim().replaceAll(" ", ""));
+					        .parseInt(docNum.substring(sNum, docNum.indexOf("</DOCNO>")).trim().replaceAll(" ", ""));
 					startDocNo = true;
 					curLineNum++;
 				}
@@ -122,5 +124,27 @@ public class QueryDataReader {
 				qTermFre.put(qTerm, (short) 1);
 			}
 		}
+	}
+
+	/**
+	 * reads the stemmed queries
+	 * 
+	 * @param filePath
+	 *            the path of the stemmed file
+	 */
+	public void readStemmedQueryDocument(String filePath) {
+		String queryFile = null;
+		HashMap<Integer, String> hm = new HashMap<>();
+		try {
+			queryFile = FileUtils.readFileToString(new File(filePath));
+		} catch (IOException e) {
+			logger.error("unable to read the stemmed query document");
+			return;
+		}
+		String[] queries = queryFile.split("\n");
+		for (int i = 1; i < queries.length; i++) {
+			hm.put(i, queries[i]);
+		}
+		this.setRaw_queries(hm);
 	}
 }
