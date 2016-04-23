@@ -71,16 +71,16 @@ public class App {
 
 		runTask2_QueryExpansion(queryReader, indexReader);
 
-		// TODO : SMITHA THIS IS THE PART FROM TASK 3A
-		// Parser.setUseStopList(true);
-		// Parser.parseStore(CorpusDirLoc, ParsedDirNameNoStopWords);
-		// Tokenizer.tokenizeIndexForStopWrds(ParsedDirNameNoStopWords, 1);
-		//
-		// queryReader.readStemmedQueryDocument(StemmedQueryDataFname);
+		// TASK 3A
+		Parser.setUseStopList(true);
+		Parser.parseStore(CorpusDirLoc, ParsedDirNameNoStopWords);
+		Tokenizer.tokenizeIndexForStopWrds(ParsedDirNameNoStopWords, 1);
+
+		// queryReader.readQueryDocument(StemmedQueryDataFname);
 		// indexReader.deserializeInvertedIndex(InvertedIndexNoStopWrdsDirName);
 		// indexReader.deserializeDocumentsLength(DocLenNoStopWordsFname);
-		//
-		// runTask3_RawQueries(queryReader, indexReader);
+
+		runTask3_RawQueries(queryReader, indexReader);
 
 		// this is for stemmed corpus
 

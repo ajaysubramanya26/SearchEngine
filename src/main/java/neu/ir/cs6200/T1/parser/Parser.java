@@ -249,7 +249,8 @@ public class Parser {
 					tmp[j] = tmp[j].replaceAll("\\.", "");
 				}
 
-				// (useStopList && isStopWord(tmp[j])
+				if (useStopList && isStopWord(tmp[j])) continue;
+
 				if (!(reachedEnd && isNumeric(tmp[j]))) {
 					numericCleanUp.append(tmp[j] + " ");
 					reachedEnd = false;
@@ -258,7 +259,6 @@ public class Parser {
 				if (tmp[j].equals("pm") || tmp[j].equals("am")) {
 					reachedEnd = true;
 				}
-
 			}
 		}
 		return numericCleanUp;
