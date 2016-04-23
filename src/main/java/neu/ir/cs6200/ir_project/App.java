@@ -2,6 +2,11 @@ package neu.ir.cs6200.ir_project;
 
 import static neu.ir.cs6200.constants.Const_FilePaths.CorpusDirLoc;
 import static neu.ir.cs6200.constants.Const_FilePaths.DocLenFname;
+import static neu.ir.cs6200.constants.Const_FilePaths.DocLenNoStopWordsFname;
+import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexDirName;
+import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFNameNoStpWrds;
+import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_DF;
+import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_TF;
 import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_Uni;
 import static neu.ir.cs6200.constants.Const_FilePaths.ParsedDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.ParsedDirNameNoStopWords;
@@ -9,8 +14,11 @@ import static neu.ir.cs6200.constants.Const_FilePaths.QueryDataFname;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task1QueryResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task2QueryResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryResults;
+import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirName;
+import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirNameNoStopWrds;
 import static neu.ir.cs6200.constants.Consts.BM25PseudoRel_Fname;
 import static neu.ir.cs6200.constants.Consts.BM25_FName;
+import static neu.ir.cs6200.constants.Consts.BM25_NoStopWords_Fname;
 import static neu.ir.cs6200.constants.Consts.TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE;
 import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_RES_DOCS_PSEUDO_RELEVANCE;
 import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_SEARCH_RES;
@@ -20,6 +28,7 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import neu.ir.cs6200.T1.indexer.IndexMode;
 import neu.ir.cs6200.T1.indexer.IndexedDataReader;
 import neu.ir.cs6200.T1.indexer.Tokenizer;
 import neu.ir.cs6200.T1.parser.Parser;
@@ -57,9 +66,18 @@ public class App {
 			return;
 		}
 
+		FileUtils.deleteFolder(TokenizerDirName);
+		FileUtils.createDirectory(TokenizerDirName);
+		FileUtils.deleteFolder(TokenizerDirNameNoStopWrds);
+		FileUtils.createDirectory(TokenizerDirNameNoStopWrds);
+		FileUtils.deleteFolder(InvertedIndexDirName);
+		FileUtils.createDirectory(InvertedIndexDirName);
+
 		Parser.setUseStopList(false);
 		Parser.parseStore(CorpusDirLoc, ParsedDirName);
-		Tokenizer.tokenizeIndex(ParsedDirName, 1);
+		Tokenizer rawTokens = new Tokenizer(InvertedIndexFName_Uni, InvertedIndexFName_TF, InvertedIndexFName_DF,
+				IndexMode.NORMAL);
+		rawTokens.tokenizeIndex(ParsedDirName, 1);
 
 		QueryDataReader queryReader = new QueryDataReader();
 		queryReader.readQueryDocument(QueryDataFname);
@@ -71,16 +89,7 @@ public class App {
 
 		runTask2_QueryExpansion(queryReader, indexReader);
 
-		// TASK 3A
-		Parser.setUseStopList(true);
-		Parser.parseStore(CorpusDirLoc, ParsedDirNameNoStopWords);
-		Tokenizer.tokenizeIndexForStopWrds(ParsedDirNameNoStopWords, 1);
-
-		// queryReader.readQueryDocument(StemmedQueryDataFname);
-		// indexReader.deserializeInvertedIndex(InvertedIndexNoStopWrdsDirName);
-		// indexReader.deserializeDocumentsLength(DocLenNoStopWordsFname);
-
-		runTask3_RawQueries(queryReader, indexReader);
+		runTask3_RawQueries(queryReader);
 
 		// this is for stemmed corpus
 
@@ -139,21 +148,30 @@ public class App {
 
 	/**
 	 * TASK 3a
-	 * 
+	 *
 	 * @param queryReader
 	 * @param indexReader
 	 */
-	public static void runTask3_RawQueries(QueryDataReader queryReader, IndexedDataReader indexReader) {
+	public static void runTask3_RawQueries(QueryDataReader queryReader) {
 		System.out.println("running task 3");
 
 		FileUtils.createDirectory(Task3QueryResults);
 
+		// TASK 3A
+		Parser.setUseStopList(true);
+		Parser.parseStore(CorpusDirLoc, ParsedDirNameNoStopWords);
+		Tokenizer noStopTokenizer = new Tokenizer(InvertedIndexFNameNoStpWrds, InvertedIndexFName_TF + "_NoStopWords",
+				InvertedIndexFName_DF + "_NoStopWords", IndexMode.STOP);
+		noStopTokenizer.tokenizeIndex(ParsedDirNameNoStopWords, 1);
+		IndexedDataReader indexReaderNoStopWords = new IndexedDataReader();
+		indexReaderNoStopWords.deserializeInvertedIndex(InvertedIndexFNameNoStpWrds);
+		indexReaderNoStopWords.deserializeDocumentsLength(DocLenNoStopWordsFname);
+
 		BM25 bm25 = new BM25(Consts.k1, Consts.b, Consts.k2, TOPN_QUERY_SEARCH_RES, Task3QueryResults);
-		bm25.runBM25(queryReader.getRaw_queries(), indexReader, BM25_FName);
+		bm25.runBM25(queryReader.getRaw_queries(), indexReaderNoStopWords, BM25_NoStopWords_Fname);
 
-		Lucene_SimpleAnalyzer.runLucene(queryReader, ParsedDirNameNoStopWords, Task3QueryResults);
-
-		TF_IDF tfidf = new TF_IDF(TOPN_QUERY_SEARCH_RES, Task3QueryResults);
-		tfidf.runTFIDF(queryReader.getRaw_queries(), indexReader);
+		// queryReader.readQueryDocument(StemmedQueryDataFname);
+		// indexReader.deserializeInvertedIndex(InvertedIndexNoStopWrdsDirName);
+		// indexReader.deserializeDocumentsLength(DocLenNoStopWordsFname);
 	}
 }

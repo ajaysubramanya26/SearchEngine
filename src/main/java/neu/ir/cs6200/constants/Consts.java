@@ -10,6 +10,7 @@ public class Consts {
 
 	public static final String BM25_FName = "BM25";
 	public static final String BM25PseudoRel_Fname = "BM25PseudoRel";
+	public static final String BM25_NoStopWords_Fname = "BM25_NoStopWords";
 
 	// BM25 constants
 	public static final double k1 = 1.2;

@@ -2,14 +2,6 @@ package neu.ir.cs6200.T1.indexer;
 
 import static neu.ir.cs6200.constants.Const_FilePaths.DocLenFname;
 import static neu.ir.cs6200.constants.Const_FilePaths.DocLenNoStopWordsFname;
-import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexDirName;
-import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFNameNoStpWrds;
-import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_DF;
-import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_No_StpWrds_DF;
-import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_No_StpWrds_TF;
-import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_TF;
-import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_Uni;
-import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexNoStopWrdsDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirNameNoStopWrds;
 
@@ -23,8 +15,6 @@ import org.apache.log4j.Logger;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
-import neu.ir.cs6200.utils.FileUtils;
-
 /**
  * Tokenizer and InvertedIndex formation
  *
@@ -32,6 +22,18 @@ import neu.ir.cs6200.utils.FileUtils;
  *
  */
 public class Tokenizer {
+
+	String fNameInvertedIndex;
+	String fNameTF;
+	String fNameDF;
+	IndexMode indexMode;
+
+	public Tokenizer(String fNameInvertedIndex, String fNameTF, String fNameDF, IndexMode indexMode) {
+		this.fNameInvertedIndex = fNameInvertedIndex;
+		this.fNameTF = fNameTF;
+		this.fNameDF = fNameDF;
+		this.indexMode = indexMode;
+	}
 
 	final static Logger logger = Logger.getLogger(Tokenizer.class);
 
@@ -43,13 +45,9 @@ public class Tokenizer {
 	 * @param N
 	 *            - words (Uni, Bi, Tri etc)
 	 */
-	public static void tokenizeIndex(String parserOutput, int N) {
+	public void tokenizeIndex(String parserOutput, int N) {
 
-		logger.info("In tokenizeIndex");
-		FileUtils.deleteFolder(TokenizerDirName);
-		FileUtils.createDirectory(TokenizerDirName);
-		FileUtils.deleteFolder(InvertedIndexDirName);
-		FileUtils.createDirectory(InvertedIndexDirName);
+		logger.info("In tokenizeIndex " + this.indexMode);
 
 		File parserFolder = new File(parserOutput);
 		File[] listOfFiles = null;
@@ -68,53 +66,23 @@ public class Tokenizer {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-				tokenizeInvertedIndex(docContents, file.getName().replaceAll(".txt", ""), indexer, N);
-			}
-
-			indexer.storeInvertedIndex(indexer.invertedIndex, InvertedIndexFName_Uni);
-			indexer.storeTermFrequency(indexer.invertedIndex, InvertedIndexFName_TF + "_N" + N);
-			indexer.storeDocFrequencyPerTerm(indexer.invertedIndex, InvertedIndexFName_DF + "_N" + N);
-
-		}
-	}
-
-	public static void tokenizeIndexForStopWrds(String parserOutput, int N) {
-
-		logger.info("In tokenizeIndex");
-		FileUtils.deleteFolder(TokenizerDirNameNoStopWrds);
-		FileUtils.createDirectory(TokenizerDirNameNoStopWrds);
-		FileUtils.deleteFolder(InvertedIndexNoStopWrdsDirName);
-		FileUtils.createDirectory(InvertedIndexNoStopWrdsDirName);
-
-		File parserFolder = new File(parserOutput);
-		File[] listOfFiles = null;
-		if (parserFolder.isDirectory()) {
-			listOfFiles = parserFolder.listFiles();
-			InvertedIndex indexer = new InvertedIndex();
-			for (File file : listOfFiles) {
-				/* Read File */
-				StringBuilder docContents = new StringBuilder();
-				try {
-					List<String> lines = Files.readLines(file, Charsets.UTF_8);
-					for (String eachLine : lines) {
-						docContents.append(eachLine);
-						docContents.append(" ");
-					}
-				} catch (IOException e1) {
-					e1.printStackTrace();
+				if (this.indexMode == IndexMode.NORMAL) {
+					tokenizeInvertedIndex(docContents, file.getName().replaceAll(".txt", ""), indexer, N);
+				} else if (this.indexMode == IndexMode.STOP) {
+					tokenizeInvertedIndexStopList(docContents, file.getName().replaceAll(".txt", ""), indexer, N);
 				}
-				tokenizeInvertedIndexStopList(docContents, file.getName().replaceAll(".txt", ""), indexer, N);
 			}
 
-			indexer.storeInvertedIndex(indexer.invertedIndex, InvertedIndexFNameNoStpWrds);
-			indexer.storeTermFrequency(indexer.invertedIndex, InvertedIndexFName_No_StpWrds_TF + "_N" + N);
-			indexer.storeDocFrequencyPerTerm(indexer.invertedIndex, InvertedIndexFName_No_StpWrds_DF + "_N" + N);
+			indexer.storeInvertedIndex(indexer.invertedIndex, this.fNameInvertedIndex);
+			indexer.storeTermFrequency(indexer.invertedIndex, this.fNameTF);
+			indexer.storeDocFrequencyPerTerm(indexer.invertedIndex, this.fNameDF);
+
 		}
 	}
 
 	/**
 	 * Reads each file, tokenizes and stores in the Inverted Index
-	 * 
+	 *
 	 * @param sb
 	 * @param docId
 	 * @param indexer

@@ -7,22 +7,23 @@ public class Const_FilePaths {
 
 	public static final String Results = "Results";
 	public static final String InvertedIndexDirName = "Results" + "/" + "Indexer_Output";
-	public static final String InvertedIndexNoStopWrdsDirName = "Results" + "/" + "Indexer_Output_No_Stp_Wrds";
+	public static final String InvertedIndexNoStopWrdsDirName = "Results" + "/" + "Indexer_Output_NoStopWords";
 	public static final String TokenizerDirName = "Results" + "/" + "Tokenizer_Output";
-	public static final String TokenizerDirNameNoStopWrds = "Results" + "/" + "Tokenizer_Output_No_Stp_Wrds";
+	public static final String TokenizerDirNameNoStopWrds = "Results" + "/" + "Tokenizer_Output_NoStopWords";
+
 	public static final String ParsedDirName = "Results" + "/" + "Parser_Output";
-	public static final String ParsedDirNameNoStopWords = "Results" + "/" + "Parser_Output_No_Stop_Words";
+	public static final String ParsedDirNameNoStopWords = "Results" + "/" + "Parser_Output_NoStopWords";
 	public static final String InvertedIndexFName_Uni = InvertedIndexDirName + "/" + "InvertedIndex_N1";
-	public static final String InvertedIndexFNameNoStpWrds = InvertedIndexNoStopWrdsDirName + "/"
-	        + "InvertedIndex_No_StpWrds_N1";
+	public static final String InvertedIndexFNameNoStpWrds = InvertedIndexDirName + "/" + "InvertedIndex_NoStopWords";
 	public static final String InvertedIndexFName_TF = InvertedIndexDirName + "/" + "InvertedIndex_TF";
-	public static final String InvertedIndexFName_No_StpWrds_TF = InvertedIndexNoStopWrdsDirName + "/"
-	        + "InvertedIndex_No_StpWrds_TF";
+
+	public static final String InvertedIndexFName_No_StpWrds_TF = InvertedIndexDirName + "/"
+			+ "InvertedIndex_No_StpWrds_TF";
 	public static final String InvertedIndexFName_DF = InvertedIndexDirName + "/" + "InvertedIndex_DF";
-	public static final String InvertedIndexFName_No_StpWrds_DF = InvertedIndexNoStopWrdsDirName + "/"
-	        + "InvertedIndex_No_StpWrds_DF";
+	public static final String InvertedIndexFName_No_StpWrds_DF = InvertedIndexDirName + "/"
+			+ "InvertedIndex_No_StpWrds_DF";
 	public static final String DocLenFname = InvertedIndexDirName + "/" + "DocumentsLength";
-	public static final String DocLenNoStopWordsFname = InvertedIndexNoStopWrdsDirName + "/" + "DocumentsLength";
+	public static final String DocLenNoStopWordsFname = InvertedIndexDirName + "/" + "DocumentsLength_NoStopWords";
 
 	public static final String QueryDataFname = "data/cacm.query";
 	public static final String StemmedCorpus = "data/cacm_stem.txt";
