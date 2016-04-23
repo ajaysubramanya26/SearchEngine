@@ -86,7 +86,7 @@ public class SynonymQueryExpansion {
 	 * @return
 	 */
 	private static String expandQueryTerm(String queryTerm, IndexedDataReader index) {
-		StringBuilder expandedQueryTerm = new StringBuilder();
+		StringBuilder expandedQueryTerm = new StringBuilder(queryTerm + " ");
 		String[] synonyms = wordSynonymsMap.getSynonyms(queryTerm);
 		int count = 0;
 		for (String synonym : synonyms) {
@@ -94,7 +94,7 @@ public class SynonymQueryExpansion {
 			// index.getTermFrequencyCourpus().get(synonym);
 			expandedQueryTerm.append(synonym + " ");
 			count++;
-			if (count == 5) {
+			if (count == 2) {
 				break;
 			}
 		}

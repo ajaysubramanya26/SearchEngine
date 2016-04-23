@@ -40,6 +40,7 @@ import neu.ir.cs6200.T1.ranking.Lucene_SimpleAnalyzer;
 import neu.ir.cs6200.T1.ranking.TF_IDF;
 import neu.ir.cs6200.constants.Consts;
 import neu.ir.cs6200.evaluator.Mode;
+import neu.ir.cs6200.evaluator.SearchEngineEvaluator;
 import neu.ir.cs6200.querydata.PseudoRevelance;
 import neu.ir.cs6200.querydata.QueryDataReader;
 import neu.ir.cs6200.querydata.SynonymQueryExpansion;
@@ -92,8 +93,8 @@ public class App {
 		Lucene_SimpleAnalyzer.runLucene(queryReader, ParsedDirNameNoStopWords, TaskTable7Results,
 				LuceneWithoutStopSyn_Fname);
 
-		// SearchEngineEvaluator eval = new SearchEngineEvaluator();
-		// eval.evaluate();
+		SearchEngineEvaluator eval = new SearchEngineEvaluator();
+		eval.evaluate();
 
 		logger.info("Done");
 
