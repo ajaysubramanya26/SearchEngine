@@ -9,9 +9,10 @@ public class Consts {
 	public static final int TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE = 10;
 
 	public static final String BM25_FName = "BM25";
+	public static final String TFIDF = "TFIDF";
 	public static final String BM25PseudoRel_Fname = "BM25PseudoRel";
-	public static final String SynonymPseudoRel_Fname = "SynBM25Rel";
-	public static final String BM25_NoStopWords_Fname = "BM25Stopping";
+	public static final String BM25_Synonym_Fname = "BM25SynRel";
+	public static final String BM25_Stopping_Fname = "BM25Stopping";
 	public static final String BM25_Stem_Fname = "BM25_Stem";
 	public static final String Lucene_Fname = "Lucene";
 	public static final String LuceneWithoutStopSyn_Fname = "T7";

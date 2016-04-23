@@ -2,7 +2,8 @@ package neu.ir.cs6200.querydata;
 
 import static neu.ir.cs6200.constants.Const_FilePaths.Task1QueryResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task2QueryResults;
-import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryResults;
+import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStopWordsResults;
+import static neu.ir.cs6200.constants.Const_FilePaths.TaskTable7Results;
 import static neu.ir.cs6200.constants.Consts.DOCID_INDEX_QUERY_RESULT;
 
 import java.io.BufferedReader;
@@ -67,10 +68,12 @@ public class QueryResultReader {
 
 		if (mode == Mode.BM25 || mode == Mode.LUCENE || mode == Mode.TFIDF) {
 			return Task1QueryResults;
-		} else if (mode == Mode.PSEUDO_REL_QE || mode == Mode.QE2) {
+		} else if (mode == Mode.PSEUDO_REL_QE || mode == Mode.SYN_QE) {
 			return Task2QueryResults;
-		} else if (mode == Mode.STOPPING || mode == Mode.T7) {
-			return Task3QueryResults;
+		} else if (mode == Mode.STOPPING) {
+			return Task3QueryStopWordsResults;
+		} else if (mode == Mode.T7) {
+			return TaskTable7Results;
 		}
 		return null;
 	}
