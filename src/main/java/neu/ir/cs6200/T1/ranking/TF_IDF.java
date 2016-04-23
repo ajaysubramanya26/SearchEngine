@@ -155,17 +155,11 @@ public class TF_IDF {
 		 */
 		for (String docId : queryDocs) {
 			double queryScore = 0.0;
-			// double normalizationDenominator = 0.0;
+
 			for (String queryTerm : qTermFre.keySet()) {
 				double score = tfIDFScorePerDocumentPerQTerm(docId, queryTerm);
 				queryScore += score;
-				// normalizationDenominator += Math.pow(score, 2);
 			}
-			// double finalNormalization = Math.sqrt(normalizationDenominator);
-			// if (finalNormalization != 0.0) {
-			// rankScoreHm.put(docId, (queryScore /
-			// Math.sqrt(normalizationDenominator)));
-			// }
 			rankScoreHm.put(docId, queryScore);
 		}
 
