@@ -1,18 +1,20 @@
 package neu.ir.cs6200.evaluator;
 
+import neu.ir.cs6200.constants.Consts;
+
 /**
  * @author kamlendrak
  *
  */
 public enum Mode {
 
-		BM25("BM25"),
-		TFIDF("TFIDF"),
-		LUCENE("Lucene"),
-		PSEUDO_REL_QE("BM25PseudoRel"),
-		QE2("QE2"),
-		STOPPING("BM25Stopping"),
-		T7("t7");
+		BM25(Consts.BM25_FName),
+		TFIDF(Consts.TFIDF),
+		LUCENE(Consts.Lucene_Fname),
+		PSEUDO_REL_QE(Consts.BM25PseudoRel_Fname),
+		SYN_QE(Consts.BM25_Synonym_Fname),
+		STOPPING(Consts.BM25_Stopping_Fname),
+		T7(Consts.LuceneWithoutStopSyn_Fname);
 
 	public final String mode;
 

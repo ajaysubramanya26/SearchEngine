@@ -17,13 +17,13 @@ import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStopWordsResults
 import static neu.ir.cs6200.constants.Const_FilePaths.TaskTable7Results;
 import static neu.ir.cs6200.constants.Consts.BM25PseudoRel_Fname;
 import static neu.ir.cs6200.constants.Consts.BM25_FName;
-import static neu.ir.cs6200.constants.Consts.BM25_NoStopWords_Fname;
+import static neu.ir.cs6200.constants.Consts.BM25_Stopping_Fname;
+import static neu.ir.cs6200.constants.Consts.BM25_Synonym_Fname;
 import static neu.ir.cs6200.constants.Consts.LuceneWithoutStopSyn_Fname;
 import static neu.ir.cs6200.constants.Consts.Lucene_Fname;
 import static neu.ir.cs6200.constants.Consts.TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE;
 import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_RES_DOCS_PSEUDO_RELEVANCE;
 import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_SEARCH_RES;
-import static neu.ir.cs6200.constants.Consts.SynonymPseudoRel_Fname;
 
 import java.io.File;
 import java.util.Map;
@@ -145,7 +145,7 @@ public class App {
 
 		Map<Integer, String> synonymExpandedQueries = SynonymQueryExpansion.expandQueries(queryReader.getRaw_queries(),
 				indexReader);
-		bm25.runBM25(synonymExpandedQueries, indexReader, SynonymPseudoRel_Fname);
+		bm25.runBM25(synonymExpandedQueries, indexReader, BM25_Synonym_Fname);
 
 	}
 
@@ -170,7 +170,7 @@ public class App {
 		indexReaderNoStopWords.deserializeDocumentsLength(DocLenNoStopWordsFname);
 
 		BM25 bm25 = new BM25(Consts.k1, Consts.b, Consts.k2, TOPN_QUERY_SEARCH_RES, Task3QueryStopWordsResults);
-		bm25.runBM25(queryReader.getRaw_queries(), indexReaderNoStopWords, BM25_NoStopWords_Fname);
+		bm25.runBM25(queryReader.getRaw_queries(), indexReaderNoStopWords, BM25_Stopping_Fname);
 
 		// Task 3b
 		Parser.setUseStopList(false);
