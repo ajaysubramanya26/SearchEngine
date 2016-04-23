@@ -103,7 +103,7 @@ public class Parser {
 	public static void parseStmdCrps(String dir, int numDocs) {
 		Map<Integer, String> stemmed = new HashMap<>();
 		Map<String, Integer> docIdNumTokens = new HashMap<>();
-		Map<String, Map<String, Integer>> uniGram = new HashMap<>();
+		Map<String, Map<String, Integer>> stmdCrpsIndx = new HashMap<>();
 		ArrayList<String> tokens;
 
 		String corpus = null;
@@ -135,11 +135,11 @@ public class Parser {
 
 			for (int j = 0; j < numTokens; j++) {
 				String token = tokens.get(j).toLowerCase().trim();
-				if (isValid(token)) addToTable(token, fileName, uniGram);
+				if (isValid(token)) addToTable(token, fileName, stmdCrpsIndx);
 			}
 		}
 
-		logger.info("index size " + uniGram.size());
+		logger.info("index size " + stmdCrpsIndx.size());
 
 	}
 
