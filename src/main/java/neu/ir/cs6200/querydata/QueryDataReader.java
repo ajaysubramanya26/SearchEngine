@@ -147,7 +147,7 @@ public class QueryDataReader {
 			return null;
 		}
 		String[] queries = queryFile.split("\n");
-		for (int i = 0; i < queries.length - 1; i++) {
+		for (int i = 0; i < queries.length; i++) {
 			stmdQuries.put(i + 1, queries[i]);
 		}
 		return stmdQuries;
