@@ -49,7 +49,7 @@ public class Lucene_SimpleAnalyzer {
 	private String fullPathIndex;
 	private String queryResultDir;
 
-	public void searchLucene(String query, int qNum, String sysName) {
+	public void searchLucene(String query, int qNum, String sysName, String qFileAppender) {
 		try {
 			IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(fullPathIndex)));
 			IndexSearcher searcher = new IndexSearcher(reader);
@@ -61,7 +61,7 @@ public class Lucene_SimpleAnalyzer {
 
 			// 4. display results
 			logger.debug("Found " + hits.length + " hits. for Q" + qNum);
-			File fileQResLucene = new File(this.queryResultDir + "/Q" + qNum + "_Lucene");
+			File fileQResLucene = new File(this.queryResultDir + "/Q" + qNum + "_" + qFileAppender);
 			for (int i = 0; i < hits.length; ++i) {
 				int docId = hits[i].doc;
 				Document d = searcher.doc(docId);
@@ -215,14 +215,15 @@ public class Lucene_SimpleAnalyzer {
 	 * @param queryResultDir
 	 *
 	 */
-	public static void runLucene(QueryDataReader queryReader, String parsedDirName, String queryResultDir) {
+	public static void runLucene(QueryDataReader queryReader, String parsedDirName, String queryResultDir,
+			String qFileAppender) {
 
 		logger.info("Running Lucene.... Using SimpleAnalyzer");
 		Lucene_SimpleAnalyzer indexer = createLuceneSimpleIndexer(Temp_IndexLucene, parsedDirName, queryResultDir);
 
 		for (int qNum : queryReader.raw_queries.keySet()) {
 			logger.debug("Running Lucene SimpleAnalyzer ranking for query :" + queryReader.raw_queries.get(qNum));
-			indexer.searchLucene(queryReader.raw_queries.get(qNum), qNum, IR_SystemName);
+			indexer.searchLucene(queryReader.raw_queries.get(qNum), qNum, IR_SystemName, qFileAppender);
 			logger.debug("");
 		}
 	}

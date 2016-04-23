@@ -16,11 +16,14 @@ import static neu.ir.cs6200.constants.Const_FilePaths.Task1QueryResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task2QueryResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStemmedResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStopWordsResults;
+import static neu.ir.cs6200.constants.Const_FilePaths.TaskTable7Results;
 import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirNameNoStopWrds;
 import static neu.ir.cs6200.constants.Consts.BM25PseudoRel_Fname;
 import static neu.ir.cs6200.constants.Consts.BM25_FName;
 import static neu.ir.cs6200.constants.Consts.BM25_NoStopWords_Fname;
+import static neu.ir.cs6200.constants.Consts.LuceneWithoutStopSyn_Fname;
+import static neu.ir.cs6200.constants.Consts.Lucene_Fname;
 import static neu.ir.cs6200.constants.Consts.TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE;
 import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_RES_DOCS_PSEUDO_RELEVANCE;
 import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_SEARCH_RES;
@@ -78,7 +81,7 @@ public class App {
 		Parser.setUseStopList(false);
 		Parser.parseStore(CorpusDirLoc, ParsedDirName);
 		Tokenizer rawTokens = new Tokenizer(InvertedIndexFName_Uni, InvertedIndexFName_TF, InvertedIndexFName_DF,
-		        IndexMode.NORMAL);
+				IndexMode.NORMAL);
 		rawTokens.tokenizeIndex(ParsedDirName, 1);
 
 		QueryDataReader queryReader = new QueryDataReader();
@@ -93,7 +96,14 @@ public class App {
 
 		runTask3_RawQueries(queryReader);
 
-		// this is for stemmed corpus
+		// Produce one more (seventh) run that does one of the following:
+		// 1- Combines a query expansion technique with stopping
+		// 2- Uses a different base search engine than the one you chose
+		// earlier, and adopts either a query expansion technique and/or
+		// stopping
+		FileUtils.createDirectory(TaskTable7Results);
+		Lucene_SimpleAnalyzer.runLucene(queryReader, ParsedDirNameNoStopWords, TaskTable7Results,
+				LuceneWithoutStopSyn_Fname);
 
 		// SearchEngineEvaluator eval = new SearchEngineEvaluator();
 		// eval.evaluate();
@@ -116,11 +126,14 @@ public class App {
 
 		FileUtils.createDirectory(Task1QueryResults);
 
+		// Table1
 		BM25 bm25 = new BM25(Consts.k1, Consts.b, Consts.k2, TOPN_QUERY_SEARCH_RES, Task1QueryResults);
 		bm25.runBM25(queryReader.getRaw_queries(), indexReader, BM25_FName);
 
-		Lucene_SimpleAnalyzer.runLucene(queryReader, ParsedDirName, Task1QueryResults);
+		// Table2
+		Lucene_SimpleAnalyzer.runLucene(queryReader, ParsedDirName, Task1QueryResults, Lucene_Fname);
 
+		// Table3
 		TF_IDF tfidf = new TF_IDF(TOPN_QUERY_SEARCH_RES, Task1QueryResults);
 		tfidf.runTFIDF(queryReader.getRaw_queries(), indexReader);
 	}
@@ -145,7 +158,7 @@ public class App {
 	}
 
 	/**
-	 * TASK 3a
+	 * TASK 3a, 3b
 	 *
 	 * @param queryReader
 	 * @param indexReader
@@ -156,11 +169,11 @@ public class App {
 		FileUtils.createDirectory(Task3QueryStopWordsResults);
 		FileUtils.createDirectory(Task3QueryStemmedResults);
 
-		// TASK 3A
+		// TASK 3a
 		Parser.setUseStopList(true);
 		Parser.parseStore(CorpusDirLoc, ParsedDirNameNoStopWords);
 		Tokenizer noStopTokenizer = new Tokenizer(InvertedIndexFNameNoStpWrds, InvertedIndexFName_TF + "_NoStopWords",
-		        InvertedIndexFName_DF + "_NoStopWords", IndexMode.STOP);
+				InvertedIndexFName_DF + "_NoStopWords", IndexMode.STOP);
 		noStopTokenizer.tokenizeIndex(ParsedDirNameNoStopWords, 1);
 
 		IndexedDataReader indexReaderNoStopWords = new IndexedDataReader();
