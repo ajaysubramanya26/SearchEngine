@@ -164,6 +164,7 @@ public class App {
 		Tokenizer noStopTokenizer = new Tokenizer(InvertedIndexFNameNoStpWrds, InvertedIndexFName_TF + "_NoStopWords",
 				InvertedIndexFName_DF + "_NoStopWords", IndexMode.STOP);
 		noStopTokenizer.tokenizeIndex(ParsedDirNameNoStopWords, 1);
+
 		IndexedDataReader indexReaderNoStopWords = new IndexedDataReader();
 		indexReaderNoStopWords.deserializeInvertedIndex(InvertedIndexFNameNoStpWrds);
 		indexReaderNoStopWords.deserializeDocumentsLength(DocLenNoStopWordsFname);

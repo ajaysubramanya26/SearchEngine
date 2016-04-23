@@ -242,11 +242,44 @@ public class BM25 {
 		return first * second * third;
 	}
 
+	/**
+	 * Runs BM25 <br>
+	 * Used this when inverted index when read back from file<br>
+	 *
+	 * @param queries
+	 * @param indexReader
+	 * @param fileNameAppender
+	 */
 	public void runBM25(HashMap<Integer, String> queries, IndexedDataReader indexReader, String fileNameAppender) {
 		logger.info("Running BM25");
 
 		this.setInvertedLists(indexReader.getInvertedLists());
 		this.setDocumentLenHm(indexReader.getDocumentLenHm(), indexReader.getTotalDocLenCorpus());
+
+		logger.debug("Document Length HM Size " + this.getDocumentLenHm().size() + "totalDocLenCorpus "
+				+ this.totalDocLenCorpus);
+		for (int qNum : queries.keySet()) {
+			logger.debug("Running BM25 ranking for query :" + queries.get(qNum));
+			this.searchBM25(queries.get(qNum), qNum, IR_SystemName, fileNameAppender);
+			logger.debug("");
+		}
+	}
+
+	/**
+	 * To be used when inverted index is built in memory
+	 *
+	 * @param queries
+	 * @param indexer
+	 * @param docLen
+	 * @param totalDocLen
+	 * @param fileNameAppender
+	 */
+	public void runBM25Stem(HashMap<Integer, String> queries, HashMap<String, HashMap<String, Integer>> indexer,
+			HashMap<String, Long> docLen, Long totalDocLen, String fileNameAppender) {
+		logger.info("Running BM25");
+
+		this.setInvertedLists(indexer);
+		this.setDocumentLenHm(docLen, totalDocLen);
 
 		logger.debug("Document Length HM Size " + this.getDocumentLenHm().size() + "totalDocLenCorpus "
 				+ this.totalDocLenCorpus);
