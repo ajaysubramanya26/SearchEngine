@@ -14,7 +14,8 @@ import static neu.ir.cs6200.constants.Const_FilePaths.QueryDataFname;
 import static neu.ir.cs6200.constants.Const_FilePaths.StemmedCorpus;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task1QueryResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task2QueryResults;
-import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryResults;
+import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStemmedResults;
+import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStopWordsResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirNameNoStopWrds;
 import static neu.ir.cs6200.constants.Consts.BM25PseudoRel_Fname;
@@ -77,7 +78,7 @@ public class App {
 		Parser.setUseStopList(false);
 		Parser.parseStore(CorpusDirLoc, ParsedDirName);
 		Tokenizer rawTokens = new Tokenizer(InvertedIndexFName_Uni, InvertedIndexFName_TF, InvertedIndexFName_DF,
-				IndexMode.NORMAL);
+		        IndexMode.NORMAL);
 		rawTokens.tokenizeIndex(ParsedDirName, 1);
 
 		QueryDataReader queryReader = new QueryDataReader();
@@ -93,10 +94,6 @@ public class App {
 		runTask3_RawQueries(queryReader);
 
 		// this is for stemmed corpus
-
-		Parser.setUseStopList(false);
-		int numberOfStemmedDocs = 3204;
-		Parser.parseStmdCrps(StemmedCorpus, numberOfStemmedDocs);
 
 		// SearchEngineEvaluator eval = new SearchEngineEvaluator();
 		// eval.evaluate();
@@ -156,24 +153,27 @@ public class App {
 	public static void runTask3_RawQueries(QueryDataReader queryReader) {
 		System.out.println("running task 3");
 
-		FileUtils.createDirectory(Task3QueryResults);
+		FileUtils.createDirectory(Task3QueryStopWordsResults);
+		FileUtils.createDirectory(Task3QueryStemmedResults);
 
 		// TASK 3A
 		Parser.setUseStopList(true);
 		Parser.parseStore(CorpusDirLoc, ParsedDirNameNoStopWords);
 		Tokenizer noStopTokenizer = new Tokenizer(InvertedIndexFNameNoStpWrds, InvertedIndexFName_TF + "_NoStopWords",
-				InvertedIndexFName_DF + "_NoStopWords", IndexMode.STOP);
+		        InvertedIndexFName_DF + "_NoStopWords", IndexMode.STOP);
 		noStopTokenizer.tokenizeIndex(ParsedDirNameNoStopWords, 1);
 
 		IndexedDataReader indexReaderNoStopWords = new IndexedDataReader();
 		indexReaderNoStopWords.deserializeInvertedIndex(InvertedIndexFNameNoStpWrds);
 		indexReaderNoStopWords.deserializeDocumentsLength(DocLenNoStopWordsFname);
 
-		BM25 bm25 = new BM25(Consts.k1, Consts.b, Consts.k2, TOPN_QUERY_SEARCH_RES, Task3QueryResults);
+		BM25 bm25 = new BM25(Consts.k1, Consts.b, Consts.k2, TOPN_QUERY_SEARCH_RES, Task3QueryStopWordsResults);
 		bm25.runBM25(queryReader.getRaw_queries(), indexReaderNoStopWords, BM25_NoStopWords_Fname);
 
-		// queryReader.readQueryDocument(StemmedQueryDataFname);
-		// indexReader.deserializeInvertedIndex(InvertedIndexNoStopWrdsDirName);
-		// indexReader.deserializeDocumentsLength(DocLenNoStopWordsFname);
+		// Task 3b
+		Parser.setUseStopList(false);
+		int numberOfStemmedDocs = 3204;
+		Parser.stemAndRunBm25(StemmedCorpus, numberOfStemmedDocs);
+
 	}
 }

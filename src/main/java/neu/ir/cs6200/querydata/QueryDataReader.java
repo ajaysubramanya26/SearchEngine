@@ -132,19 +132,19 @@ public class QueryDataReader {
 	 * @param filePath
 	 *            the path of the stemmed file
 	 */
-	public void readStemmedQueryDocument(String filePath) {
+	public static HashMap<Integer, String> readStemmedQueryDocument(String filePath) {
 		String queryFile = null;
-		HashMap<Integer, String> hm = new HashMap<>();
+		HashMap<Integer, String> stmdQuries = new HashMap<>();
 		try {
 			queryFile = FileUtils.readFileToString(new File(filePath));
 		} catch (IOException e) {
 			logger.error("unable to read the stemmed query document");
-			return;
+			return null;
 		}
 		String[] queries = queryFile.split("\n");
 		for (int i = 1; i < queries.length; i++) {
-			hm.put(i, queries[i]);
+			stmdQuries.put(i, queries[i]);
 		}
-		this.setRaw_queries(hm);
+		return stmdQuries;
 	}
 }

@@ -1,13 +1,16 @@
 package neu.ir.cs6200.T1.parser;
 
+import static neu.ir.cs6200.constants.Const_FilePaths.StemmedQueryDataFname;
 import static neu.ir.cs6200.constants.Const_FilePaths.StopListLoc;
+import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStemmedResults;
+import static neu.ir.cs6200.constants.Consts.BM25_Stem_Fname;
+import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_SEARCH_RES;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +24,9 @@ import org.jsoup.select.Elements;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
+import neu.ir.cs6200.T1.ranking.BM25;
+import neu.ir.cs6200.constants.Consts;
+import neu.ir.cs6200.querydata.QueryDataReader;
 import neu.ir.cs6200.utils.FileUtils;
 
 /**
@@ -100,12 +106,12 @@ public class Parser {
 	 * @param numDocs
 	 *            the number of stemmed documents in the file
 	 */
-	public static void parseStmdCrps(String dir, int numDocs) {
-		Map<Integer, String> stemmed = new HashMap<>();
-		Map<String, Integer> docIdNumTokens = new HashMap<>();
-		Map<String, Map<String, Integer>> stmdCrpsIndx = new HashMap<>();
+	public static void stemAndRunBm25(String dir, int numDocs) {
+		HashMap<Integer, String> stemmed = new HashMap<>();
+		HashMap<String, Long> docIdNumTokens = new HashMap<>();
+		HashMap<String, HashMap<String, Integer>> stmdCrpsIndx = new HashMap<>();
 		ArrayList<String> tokens;
-
+		Long docLen = 0L;
 		String corpus = null;
 
 		try {
@@ -129,8 +135,8 @@ public class Parser {
 
 			tokens = getTokensInFile(content);
 
-			int numTokens = tokens.size();
-
+			long numTokens = tokens.size();
+			docLen += numTokens;
 			docIdNumTokens.put(fileName, numTokens);
 
 			for (int j = 0; j < numTokens; j++) {
@@ -140,7 +146,9 @@ public class Parser {
 		}
 
 		logger.info("index size " + stmdCrpsIndx.size());
-
+		HashMap<Integer, String> queries = QueryDataReader.readStemmedQueryDocument(StemmedQueryDataFname);
+		BM25 bm25 = new BM25(Consts.k1, Consts.b, Consts.k2, TOPN_QUERY_SEARCH_RES, Task3QueryStemmedResults);
+		bm25.runBM25Stem(queries, stmdCrpsIndx, docIdNumTokens, docLen, BM25_Stem_Fname);
 	}
 
 	/**
@@ -202,7 +210,7 @@ public class Parser {
 	 * @param index
 	 *            [uniGram|biGram|triGram]
 	 */
-	private static void addToTable(String token, String docId, Map<String, Map<String, Integer>> index) {
+	private static void addToTable(String token, String docId, HashMap<String, HashMap<String, Integer>> index) {
 		if (index.containsKey(token)) {
 			if (index.get(token).containsKey(docId)) {
 				int tf = index.get(token).get(docId) + 1;
@@ -211,7 +219,7 @@ public class Parser {
 				index.get(token).put(docId, 1);
 			}
 		} else {
-			Map<String, Integer> temp = new HashMap<>();
+			HashMap<String, Integer> temp = new HashMap<>();
 			temp.put(docId, 1);
 			index.put(token, temp);
 		}

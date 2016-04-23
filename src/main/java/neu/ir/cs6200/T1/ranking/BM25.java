@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -164,7 +165,7 @@ public class BM25 {
 	 * @param fileNameAppender
 	 */
 	private void writeTopNDocsBM25Score(HashMap<String, Double> rankScoreHm, int qNum, String sysName,
-			String fileNameAppender) {
+	        String fileNameAppender) {
 		ListMultimap<Double, String> sortedRanks = SortUtils.sortMostToLeastScore(rankScoreHm);
 		int topRanked = 1;
 
@@ -175,7 +176,7 @@ public class BM25 {
 				List<String> docIds = sortedRanks.get(rankScore);
 				for (String docId : docIds) {
 					Files.append(new StringBuilder(qNum + " " + "Q0" + " " + docId + ".txt" + " " + topRanked + " "
-							+ rankScore + " " + sysName + "\n"), fileQResBM25, Charsets.UTF_8);
+					        + rankScore + " " + sysName + "\n"), fileQResBM25, Charsets.UTF_8);
 					topRanked++;
 
 				}
@@ -257,7 +258,7 @@ public class BM25 {
 		this.setDocumentLenHm(indexReader.getDocumentLenHm(), indexReader.getTotalDocLenCorpus());
 
 		logger.debug("Document Length HM Size " + this.getDocumentLenHm().size() + "totalDocLenCorpus "
-				+ this.totalDocLenCorpus);
+		        + this.totalDocLenCorpus);
 		for (int qNum : queries.keySet()) {
 			logger.debug("Running BM25 ranking for query :" + queries.get(qNum));
 			this.searchBM25(queries.get(qNum), qNum, IR_SystemName, fileNameAppender);
@@ -275,14 +276,14 @@ public class BM25 {
 	 * @param fileNameAppender
 	 */
 	public void runBM25Stem(HashMap<Integer, String> queries, HashMap<String, HashMap<String, Integer>> indexer,
-			HashMap<String, Long> docLen, Long totalDocLen, String fileNameAppender) {
+	        HashMap<String, Long> docLen, Long totalDocLen, String fileNameAppender) {
 		logger.info("Running BM25");
 
 		this.setInvertedLists(indexer);
 		this.setDocumentLenHm(docLen, totalDocLen);
 
 		logger.debug("Document Length HM Size " + this.getDocumentLenHm().size() + "totalDocLenCorpus "
-				+ this.totalDocLenCorpus);
+		        + this.totalDocLenCorpus);
 		for (int qNum : queries.keySet()) {
 			logger.debug("Running BM25 ranking for query :" + queries.get(qNum));
 			this.searchBM25(queries.get(qNum), qNum, IR_SystemName, fileNameAppender);

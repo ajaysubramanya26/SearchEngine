@@ -18,10 +18,10 @@ public class Const_FilePaths {
 	public static final String InvertedIndexFName_TF = InvertedIndexDirName + "/" + "InvertedIndex_TF";
 
 	public static final String InvertedIndexFName_No_StpWrds_TF = InvertedIndexDirName + "/"
-			+ "InvertedIndex_No_StpWrds_TF";
+	        + "InvertedIndex_No_StpWrds_TF";
 	public static final String InvertedIndexFName_DF = InvertedIndexDirName + "/" + "InvertedIndex_DF";
 	public static final String InvertedIndexFName_No_StpWrds_DF = InvertedIndexDirName + "/"
-			+ "InvertedIndex_No_StpWrds_DF";
+	        + "InvertedIndex_No_StpWrds_DF";
 	public static final String DocLenFname = InvertedIndexDirName + "/" + "DocumentsLength";
 	public static final String DocLenNoStopWordsFname = InvertedIndexDirName + "/" + "DocumentsLength_NoStopWords";
 
@@ -33,6 +33,8 @@ public class Const_FilePaths {
 	public static final String Task2QueryResults = QueryResultsDir + "/" + "Task2";
 	public static final String Task3QueryResults = QueryResultsDir + "/" + "Task3";
 
+	public static final String Task3QueryStopWordsResults = Task3QueryResults + "/NoStopWords";
+	public static final String Task3QueryStemmedResults = Task3QueryResults + "/Stemmed";
 	public static final String Temp_IndexLucene = "./Temp_IndexLucene";
 
 	public static final String CACM_RELEVANCE_FILE = "data/cacm.rel";
