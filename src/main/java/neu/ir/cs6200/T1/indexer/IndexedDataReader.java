@@ -25,10 +25,22 @@ public class IndexedDataReader {
 		this.invertedLists = new HashMap<String, HashMap<String, Integer>>();
 		this.documentLenHm = new HashMap<String, Long>();
 		this.totalTermsPerDoc = new HashMap<String, Long>();
+		this.termFrequencyCourpus = new HashMap<String, Long>();
 		this.totalDocLenCorpus = 0L;
 	}
 
 	final static Logger logger = Logger.getLogger(IndexedDataReader.class);
+
+	HashMap<String, HashMap<String, Integer>> invertedLists;
+	HashMap<String, Long> documentLenHm;
+	HashMap<String, Long> termFrequencyCourpus;
+	long totalDocLenCorpus;
+
+	/**
+	 * Stores the total number of terms per doc. Used to calculate term
+	 * frequency
+	 */
+	HashMap<String, Long> totalTermsPerDoc;
 
 	public HashMap<String, HashMap<String, Integer>> getInvertedLists() {
 		return invertedLists;
@@ -53,16 +65,6 @@ public class IndexedDataReader {
 	public void setTotalDocLenCorpus(long totalDocLenCorpus) {
 		this.totalDocLenCorpus = totalDocLenCorpus;
 	}
-
-	HashMap<String, HashMap<String, Integer>> invertedLists;
-	HashMap<String, Long> documentLenHm;
-	long totalDocLenCorpus;
-
-	/**
-	 * Stores the total number of terms per doc. Used to calculate term
-	 * frequency
-	 */
-	HashMap<String, Long> totalTermsPerDoc;
 
 	/**
 	 * Read inverted Index. Stores invertedLists and also computes
@@ -109,7 +111,7 @@ public class IndexedDataReader {
 				}
 			}
 			logger.info("Number of Lines Read from File:" + rawInvertedList.size() + " Number of entries in HashMap:"
-			        + invertedLists.size());
+					+ invertedLists.size());
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -178,6 +180,28 @@ public class IndexedDataReader {
 			e.printStackTrace();
 		}
 		return stopWords;
+	}
+
+	/**
+	 * Get Map of term frequency file for entire coupus
+	 *
+	 * @param filePath
+	 * @param topNStopWords
+	 * @return
+	 */
+	public void getTermFrequencyCorpus(String filePath) {
+
+		try {
+			List<String> rawTF = Files.readAllLines(Paths.get(filePath), StandardCharsets.UTF_8);
+			for (int i = 0; i < rawTF.size(); i++) {
+				String[] terms = rawTF.get(i).split(":");
+				this.termFrequencyCourpus.put(terms[0], Long.parseLong(terms[1]));
+			}
+		} catch (NullPointerException e) {
+			logger.error("termFrequencyCourpus Null", e);
+		} catch (IOException e) {
+			logger.error("Could not read TermFrequency File", e);
+		}
 	}
 
 }

@@ -72,7 +72,7 @@ public class QueryDataReader {
 
 				if (startDoc && docNum.startsWith("<DOCNO>") && docNum.endsWith("</DOCNO>")) {
 					qNum = Integer
-					        .parseInt(docNum.substring(sNum, docNum.indexOf("</DOCNO>")).trim().replaceAll(" ", ""));
+							.parseInt(docNum.substring(sNum, docNum.indexOf("</DOCNO>")).trim().replaceAll(" ", ""));
 					startDocNo = true;
 					curLineNum++;
 				}
@@ -128,7 +128,7 @@ public class QueryDataReader {
 
 	/**
 	 * reads the stemmed queries
-	 * 
+	 *
 	 * @param filePath
 	 *            the path of the stemmed file
 	 */
@@ -147,4 +147,5 @@ public class QueryDataReader {
 		}
 		return stmdQuries;
 	}
+
 }
