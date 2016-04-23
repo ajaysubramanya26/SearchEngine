@@ -1,7 +1,12 @@
 package neu.ir.cs6200.utils;
 
+import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.Results;
+import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStemmedResults;
+import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStopWordsResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Temp_IndexLucene;
+import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirName;
+import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirNameNoStopWrds;
 
 import java.io.File;
 
@@ -9,7 +14,7 @@ import org.apache.log4j.Logger;
 
 /**
  * General file Utils like create directory, delete directory etc
- * 
+ *
  * @author smitha
  *
  */
@@ -57,6 +62,12 @@ public class FileUtils {
 	public static void dirFileSetUp() {
 		deleteFolder(Results);
 		deleteFolder(Temp_IndexLucene);
+
+		FileUtils.createDirectory(TokenizerDirName);
+		FileUtils.createDirectory(TokenizerDirNameNoStopWrds);
+		FileUtils.createDirectory(InvertedIndexDirName);
+		FileUtils.createDirectory(Task3QueryStopWordsResults);
+		FileUtils.createDirectory(Task3QueryStemmedResults);
 	}
 
 }
