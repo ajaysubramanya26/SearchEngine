@@ -77,7 +77,7 @@ public class QueryDataReader {
 
 				if (startDoc && docNum.startsWith("<DOCNO>") && docNum.endsWith("</DOCNO>")) {
 					qNum = Integer
-							.parseInt(docNum.substring(sNum, docNum.indexOf("</DOCNO>")).trim().replaceAll(" ", ""));
+					        .parseInt(docNum.substring(sNum, docNum.indexOf("</DOCNO>")).trim().replaceAll(" ", ""));
 					startDocNo = true;
 					curLineNum++;
 				}
@@ -147,8 +147,8 @@ public class QueryDataReader {
 			return null;
 		}
 		String[] queries = queryFile.split("\n");
-		for (int i = 1; i < queries.length; i++) {
-			stmdQuries.put(i, queries[i]);
+		for (int i = 0; i < queries.length - 1; i++) {
+			stmdQuries.put(i + 1, queries[i]);
 		}
 		return stmdQuries;
 	}
