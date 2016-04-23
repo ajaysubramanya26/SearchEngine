@@ -43,4 +43,6 @@ public class Const_FilePaths {
 
 	public static final String Expanded_QueryInfo = "Results" + "/" + "ExpandedQueries";
 	public static final String Pseudo_Relevance = Expanded_QueryInfo + "/" + "Pseudo_Relevance";
+	
+	public static final String SYNONYM_FILE = "data/wn_s.pl";
 }
