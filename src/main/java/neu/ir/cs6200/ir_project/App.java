@@ -54,11 +54,10 @@ public class App {
 
 		String log4jConfPath = "./log4j.properties";
 		PropertyConfigurator.configure(log4jConfPath);
+		final Logger logger = Logger.getLogger(App.class);
 
 		/** Deletes all results from previous run and creates new directories */
 		FileUtils.dirFileSetUp();
-
-		final Logger logger = Logger.getLogger(App.class);
 
 		/** Use CACM corpus folder to parsed document */
 		File dirCorpus = new File(CorpusDirLoc);

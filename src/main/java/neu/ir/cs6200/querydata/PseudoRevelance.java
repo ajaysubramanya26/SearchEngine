@@ -42,7 +42,7 @@ public class PseudoRevelance {
 		// this is the stop word list provided in data
 		stopWords.addAll(Arrays.asList(Parser.getStopWords()));
 		// merge top 50 stop words found from our parsing and indexing
-		List<String> stopList = IndexedDataReader.getStopWords_TermFrequencyFile(InvertedIndexFName_TF + "_N1", 50);
+		List<String> stopList = IndexedDataReader.getStopWords_TermFrequencyFile(InvertedIndexFName_TF, 50);
 		for (String word : stopList) {
 			if (!stopWords.contains(word)) stopWords.add(word);
 		}
