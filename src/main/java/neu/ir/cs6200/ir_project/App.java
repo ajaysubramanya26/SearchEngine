@@ -11,6 +11,7 @@ import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_Uni;
 import static neu.ir.cs6200.constants.Const_FilePaths.ParsedDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.ParsedDirNameNoStopWords;
 import static neu.ir.cs6200.constants.Const_FilePaths.QueryDataFname;
+import static neu.ir.cs6200.constants.Const_FilePaths.StemmedCorpus;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task1QueryResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task2QueryResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryResults;
@@ -93,9 +94,9 @@ public class App {
 
 		// this is for stemmed corpus
 
-		// Parser.setUseStopList(false);
-		// int numberOfStemmedDocs = 3204;
-		// Parser.parseStmdCrps(StemmedCorpus, numberOfStemmedDocs);
+		Parser.setUseStopList(false);
+		int numberOfStemmedDocs = 3204;
+		Parser.parseStmdCrps(StemmedCorpus, numberOfStemmedDocs);
 
 		// SearchEngineEvaluator eval = new SearchEngineEvaluator();
 		// eval.evaluate();
