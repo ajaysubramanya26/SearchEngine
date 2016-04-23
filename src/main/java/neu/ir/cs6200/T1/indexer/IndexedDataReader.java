@@ -204,4 +204,18 @@ public class IndexedDataReader {
 		}
 	}
 
+	/**
+	 * @return the termFrequencyCourpus
+	 */
+	public HashMap<String, Long> getTermFrequencyCourpus() {
+		return termFrequencyCourpus;
+	}
+
+	/**
+	 * @param termFrequencyCourpus the termFrequencyCourpus to set
+	 */
+	public void setTermFrequencyCourpus(HashMap<String, Long> termFrequencyCourpus) {
+		this.termFrequencyCourpus = termFrequencyCourpus;
+	}
+
 }

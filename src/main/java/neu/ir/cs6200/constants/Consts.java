@@ -10,6 +10,7 @@ public class Consts {
 
 	public static final String BM25_FName = "BM25";
 	public static final String BM25PseudoRel_Fname = "BM25PseudoRel";
+	public static final String SynonymPseudoRel_Fname = "SynBM25Rel";
 	public static final String BM25_NoStopWords_Fname = "BM25_NoStopWords";
 	public static final String BM25_Stem_Fname = "BM25_Stem";
 	public static final String Lucene_Fname = "Lucene";

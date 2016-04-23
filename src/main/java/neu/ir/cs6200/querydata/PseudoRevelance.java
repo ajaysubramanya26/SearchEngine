@@ -29,7 +29,7 @@ import neu.ir.cs6200.utils.SortUtils;
 public class PseudoRevelance {
 	private static Logger logger = Logger.getLogger(PseudoRevelance.class);
 
-	private HashMap<Integer, String> expPseudoRel_queries;
+	private Map<Integer, String> expPseudoRel_queries;
 	int numExpandedQueryTerms;
 
 	List<String> stopWords;
@@ -53,7 +53,7 @@ public class PseudoRevelance {
 	 *
 	 * @return
 	 */
-	public HashMap<Integer, String> getExpPseudoRel_queries() {
+	public Map<Integer, String> getExpPseudoRel_queries() {
 		return expPseudoRel_queries;
 	}
 

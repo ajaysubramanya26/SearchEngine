@@ -251,7 +251,7 @@ public class BM25 {
 	 * @param indexReader
 	 * @param fileNameAppender
 	 */
-	public void runBM25(HashMap<Integer, String> queries, IndexedDataReader indexReader, String fileNameAppender) {
+	public void runBM25(Map<Integer, String> queries, IndexedDataReader indexReader, String fileNameAppender) {
 		logger.info("Running BM25");
 
 		this.setInvertedLists(indexReader.getInvertedLists());
