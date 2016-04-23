@@ -83,17 +83,19 @@ public class SearchEngineEvaluator {
 			double totalPrecisionAtRank5 = 0;
 			double totalPrecisionAtRank20 = 0;
 
+			int queriesWithRelevanceInformation = 0;
 			for (int i = 1; i <= 64; i++) {
 				QueryEvaluationSummary querySummary = evaluate(i, mode);
 				if (querySummary != null) {
+					queriesWithRelevanceInformation++;
 					totalAveragePrecision += querySummary.getAveragePrecision();
 					totalReciprocalRank += (double) 1 / querySummary.getReciprocalRank();
 					totalPrecisionAtRank5 += querySummary.getResultAtRank(5).getPrecision();
 					totalPrecisionAtRank20 += querySummary.getResultAtRank(20).getPrecision();
 				}
 			}
-			writeResult(totalAveragePrecision, totalReciprocalRank, totalPrecisionAtRank5, totalPrecisionAtRank20, 64,
-					mode);
+			writeResult(totalAveragePrecision, totalReciprocalRank, totalPrecisionAtRank5, totalPrecisionAtRank20,
+					queriesWithRelevanceInformation, mode);
 		}
 	}
 
