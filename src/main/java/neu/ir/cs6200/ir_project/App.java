@@ -85,12 +85,15 @@ public class App {
 
 		runTask1_RawQueries(queryReader, indexReader);
 
-		runTask2_QueryExpansion(queryReader, indexReader);
+		Map<Integer, String> synonymExpandedQueries = SynonymQueryExpansion.expandQueries(queryReader.getRaw_queries(),
+				indexReader);
+		runTask2_QueryExpansion(queryReader, indexReader, synonymExpandedQueries);
 
 		runTask3_RawQueries(queryReader);
 
+		// Using stopping and query expansion with lucene
 		FileUtils.createDirectory(TaskTable7Results);
-		Lucene_SimpleAnalyzer.runLucene(queryReader, ParsedDirNameNoStopWords, TaskTable7Results,
+		Lucene_SimpleAnalyzer.runLucene(synonymExpandedQueries, ParsedDirNameNoStopWords, TaskTable7Results,
 				LuceneWithoutStopSyn_Fname);
 
 		SearchEngineEvaluator eval = new SearchEngineEvaluator();
@@ -119,7 +122,7 @@ public class App {
 		bm25.runBM25(queryReader.getRaw_queries(), indexReader, BM25_FName);
 
 		// Table2
-		Lucene_SimpleAnalyzer.runLucene(queryReader, ParsedDirName, Task1QueryResults, Lucene_Fname);
+		Lucene_SimpleAnalyzer.runLucene(queryReader.getRaw_queries(), ParsedDirName, Task1QueryResults, Lucene_Fname);
 
 		// Table3
 		TF_IDF tfidf = new TF_IDF(TOPN_QUERY_SEARCH_RES, Task1QueryResults);
@@ -133,8 +136,10 @@ public class App {
 	 *
 	 * @param queryReader
 	 * @param indexReader
+	 * @param synonymExpandedQueries
 	 */
-	public static void runTask2_QueryExpansion(QueryDataReader queryReader, IndexedDataReader indexReader) {
+	public static void runTask2_QueryExpansion(QueryDataReader queryReader, IndexedDataReader indexReader,
+			Map<Integer, String> synonymExpandedQueries) {
 		FileUtils.createDirectory(Task2QueryResults);
 
 		PseudoRevelance pseudoRel = new PseudoRevelance(TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE);
@@ -143,8 +148,6 @@ public class App {
 		BM25 bm25 = new BM25(Consts.k1, Consts.b, Consts.k2, TOPN_QUERY_SEARCH_RES, Task2QueryResults);
 		bm25.runBM25(pseudoRel.getExpPseudoRel_queries(), indexReader, BM25PseudoRel_Fname);
 
-		Map<Integer, String> synonymExpandedQueries = SynonymQueryExpansion.expandQueries(queryReader.getRaw_queries(),
-				indexReader);
 		bm25.runBM25(synonymExpandedQueries, indexReader, BM25_Synonym_Fname);
 
 	}

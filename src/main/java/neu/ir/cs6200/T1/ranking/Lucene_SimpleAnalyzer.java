@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
@@ -31,8 +32,6 @@ import org.apache.lucene.util.Version;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-
-import neu.ir.cs6200.querydata.QueryDataReader;
 
 /**
  * @author smitha
@@ -211,19 +210,19 @@ public class Lucene_SimpleAnalyzer {
 	/**
 	 * Runs Lucene program on given corpus and raw_queries
 	 *
-	 * @param queryReader
+	 * @param synonymExpandedQueries
 	 * @param queryResultDir
 	 *
 	 */
-	public static void runLucene(QueryDataReader queryReader, String parsedDirName, String queryResultDir,
-			String qFileAppender) {
+	public static void runLucene(Map<Integer, String> synonymExpandedQueries, String parsedDirName,
+			String queryResultDir, String qFileAppender) {
 
 		logger.info("Running Lucene.... Using SimpleAnalyzer");
 		Lucene_SimpleAnalyzer indexer = createLuceneSimpleIndexer(Temp_IndexLucene, parsedDirName, queryResultDir);
 
-		for (int qNum : queryReader.raw_queries.keySet()) {
-			logger.debug("Running Lucene SimpleAnalyzer ranking for query :" + queryReader.raw_queries.get(qNum));
-			indexer.searchLucene(queryReader.raw_queries.get(qNum), qNum, IR_SystemName, qFileAppender);
+		for (int qNum : synonymExpandedQueries.keySet()) {
+			logger.debug("Running Lucene SimpleAnalyzer ranking for query :" + synonymExpandedQueries.get(qNum));
+			indexer.searchLucene(synonymExpandedQueries.get(qNum), qNum, IR_SystemName, qFileAppender);
 			logger.debug("");
 		}
 	}
