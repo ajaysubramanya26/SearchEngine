@@ -13,7 +13,7 @@ public class Consts {
 	public static final String BM25_NoStopWords_Fname = "BM25_NoStopWords";
 	public static final String BM25_Stem_Fname = "BM25_Stem";
 	public static final String Lucene_Fname = "Lucene";
-	public static final String LuceneWithoutStopSyn_Fname = "LuceneNoStpSyn";
+	public static final String LuceneWithoutStopSyn_Fname = "T7";
 
 	// BM25 constants
 	public static final double k1 = 1.2;

@@ -3,7 +3,6 @@ package neu.ir.cs6200.ir_project;
 import static neu.ir.cs6200.constants.Const_FilePaths.CorpusDirLoc;
 import static neu.ir.cs6200.constants.Const_FilePaths.DocLenFname;
 import static neu.ir.cs6200.constants.Const_FilePaths.DocLenNoStopWordsFname;
-import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFNameNoStpWrds;
 import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_DF;
 import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_TF;
@@ -14,11 +13,8 @@ import static neu.ir.cs6200.constants.Const_FilePaths.QueryDataFname;
 import static neu.ir.cs6200.constants.Const_FilePaths.StemmedCorpus;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task1QueryResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task2QueryResults;
-import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStemmedResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStopWordsResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.TaskTable7Results;
-import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirName;
-import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirNameNoStopWrds;
 import static neu.ir.cs6200.constants.Consts.BM25PseudoRel_Fname;
 import static neu.ir.cs6200.constants.Consts.BM25_FName;
 import static neu.ir.cs6200.constants.Consts.BM25_NoStopWords_Fname;
@@ -56,11 +52,11 @@ import neu.ir.cs6200.utils.FileUtils;
 public class App {
 	public static void main(String[] args) {
 
-		/** Deletes all results from previous run and creates new directories */
-		FileUtils.dirFileSetUp();
-
 		String log4jConfPath = "./log4j.properties";
 		PropertyConfigurator.configure(log4jConfPath);
+
+		/** Deletes all results from previous run and creates new directories */
+		FileUtils.dirFileSetUp();
 
 		final Logger logger = Logger.getLogger(App.class);
 
@@ -71,13 +67,6 @@ public class App {
 			return;
 		}
 
-		FileUtils.deleteFolder(TokenizerDirName);
-		FileUtils.createDirectory(TokenizerDirName);
-		FileUtils.deleteFolder(TokenizerDirNameNoStopWrds);
-		FileUtils.createDirectory(TokenizerDirNameNoStopWrds);
-		FileUtils.deleteFolder(InvertedIndexDirName);
-		FileUtils.createDirectory(InvertedIndexDirName);
-
 		Parser.setUseStopList(false);
 		Parser.parseStore(CorpusDirLoc, ParsedDirName);
 		Tokenizer rawTokens = new Tokenizer(InvertedIndexFName_Uni, InvertedIndexFName_TF, InvertedIndexFName_DF,
@@ -87,6 +76,7 @@ public class App {
 		QueryDataReader queryReader = new QueryDataReader();
 		queryReader.readQueryDocument(QueryDataFname);
 		IndexedDataReader indexReader = new IndexedDataReader();
+		indexReader.getTermFrequencyCorpus(InvertedIndexFName_TF);
 		indexReader.deserializeInvertedIndex(InvertedIndexFName_Uni);
 		indexReader.deserializeDocumentsLength(DocLenFname);
 
@@ -96,11 +86,6 @@ public class App {
 
 		runTask3_RawQueries(queryReader);
 
-		// Produce one more (seventh) run that does one of the following:
-		// 1- Combines a query expansion technique with stopping
-		// 2- Uses a different base search engine than the one you chose
-		// earlier, and adopts either a query expansion technique and/or
-		// stopping
 		FileUtils.createDirectory(TaskTable7Results);
 		Lucene_SimpleAnalyzer.runLucene(queryReader, ParsedDirNameNoStopWords, TaskTable7Results,
 				LuceneWithoutStopSyn_Fname);
@@ -165,9 +150,6 @@ public class App {
 	 */
 	public static void runTask3_RawQueries(QueryDataReader queryReader) {
 		System.out.println("running task 3");
-
-		FileUtils.createDirectory(Task3QueryStopWordsResults);
-		FileUtils.createDirectory(Task3QueryStemmedResults);
 
 		// TASK 3a
 		Parser.setUseStopList(true);

@@ -124,7 +124,7 @@ public class Parser {
 			int start = i;
 			int end = start + 1;
 			String record = i != numDocs ? StringUtils.substringBetween(corpus, "# " + start, "# " + end)
-			        : StringUtils.substringAfter(corpus, "# " + i);
+					: StringUtils.substringAfter(corpus, "# " + i);
 			stemmed.put(i, textCleanUp(clean(record)).toString());
 		}
 
@@ -152,7 +152,7 @@ public class Parser {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param content
 	 *            the filtered HTML page contents
 	 * @return a list of tokens in the given page
@@ -171,7 +171,7 @@ public class Parser {
 
 	/**
 	 * applies a set of regex rules to the given token to validate it
-	 * 
+	 *
 	 * @param token
 	 *            a string that needs to be validated
 	 * @return the token after regex'n it
@@ -186,7 +186,7 @@ public class Parser {
 
 	/**
 	 * performs further checks on the data
-	 * 
+	 *
 	 * @param token
 	 *            the string which needs to be validated
 	 * @return
@@ -202,7 +202,7 @@ public class Parser {
 	/**
 	 * adds the given token and doc Id to the HashMap after performing minor
 	 * checks
-	 * 
+	 *
 	 * @param token
 	 *            the [uni|bi|tri]gram term
 	 * @param docId
@@ -252,7 +252,7 @@ public class Parser {
 
 			for (int j = 0; j < tmp.length; j++) {
 				if (!isNumeric(tmp[j]) && ((tmp[j].contains(".") && !(tmp[j].endsWith(".") && tmp[j].length() == 2))
-				        || tmp[j].contains(","))) {
+						|| tmp[j].contains(","))) {
 					tmp[j] = tmp[j].replaceAll("\\,", "");
 					tmp[j] = tmp[j].replaceAll("\\.", "");
 				}
@@ -282,7 +282,7 @@ public class Parser {
 	 */
 	private static String cleanFileName(File file) {
 		return file.getName().replaceAll(".html", ".txt").replaceAll("_", "").replaceAll("-", "").replaceAll("\\(", "")
-		        .replaceAll("\\)", "").replaceAll(",", "");
+				.replaceAll("\\)", "").replaceAll(",", "");
 	}
 
 	/**
@@ -318,7 +318,7 @@ public class Parser {
 	 * @return
 	 */
 	private static StringBuilder removePunctation(String str) {
-		return new StringBuilder(java.util.regex.Pattern.compile("[^\\d\\w-.:, ]").matcher(str).replaceAll(""));
+		return new StringBuilder(java.util.regex.Pattern.compile("[^\\d\\w-., ]").matcher(str).replaceAll(""));
 	}
 
 	/**
