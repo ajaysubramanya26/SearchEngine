@@ -1,6 +1,5 @@
 package neu.ir.cs6200.querydata;
 
-import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_TF;
 import static neu.ir.cs6200.constants.Const_FilePaths.ParsedDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.Pseudo_Relevance;
 
@@ -19,8 +18,6 @@ import org.apache.log4j.Logger;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
-import neu.ir.cs6200.T1.indexer.IndexedDataReader;
-import neu.ir.cs6200.T1.parser.Parser;
 import neu.ir.cs6200.constants.Const_FilePaths;
 import neu.ir.cs6200.evaluator.Mode;
 import neu.ir.cs6200.utils.FileUtils;
@@ -37,15 +34,7 @@ public class PseudoRevelance {
 	public PseudoRevelance(int numExpandedQueryTerms) {
 		expPseudoRel_queries = new HashMap<>();
 		this.numExpandedQueryTerms = numExpandedQueryTerms;
-
-		stopWords = new ArrayList<String>();
-		// this is the stop word list provided in data
-		stopWords.addAll(Arrays.asList(Parser.getStopWords()));
-		// merge top 50 stop words found from our parsing and indexing
-		List<String> stopList = IndexedDataReader.getStopWords_TermFrequencyFile(InvertedIndexFName_TF + "_N1", 50);
-		for (String word : stopList) {
-			if (!stopWords.contains(word)) stopWords.add(word);
-		}
+		stopWords = QueryDataReader.getAllStopWords();
 	}
 
 	/**

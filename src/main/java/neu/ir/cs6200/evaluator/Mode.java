@@ -11,7 +11,7 @@ public enum Mode {
 		LUCENE("Lucene"),
 		PSEUDO_REL_QE("BM25PseudoRel"),
 		QE2("QE2"),
-		STOPPING("Stopping"),
+		STOPPING("BM25Stopping"),
 		T7("t7");
 
 	public final String mode;

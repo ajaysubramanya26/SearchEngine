@@ -1,16 +1,21 @@
 package neu.ir.cs6200.querydata;
 
+import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexFName_TF;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import neu.ir.cs6200.T1.indexer.IndexedDataReader;
 import neu.ir.cs6200.T1.parser.Parser;
 
 /**
@@ -148,4 +153,21 @@ public class QueryDataReader {
 		return stmdQuries;
 	}
 
+	/**
+	 * Returns a combined StopWords list from given data common words and top 50
+	 * most occuring words from our term frequency
+	 *
+	 * @return
+	 */
+	public static List<String> getAllStopWords() {
+		List<String> stopWords = new ArrayList<String>();
+		// this is the stop word list provided in data
+		stopWords.addAll(Arrays.asList(Parser.getStopWords()));
+		// merge top 50 stop words found from our parsing and indexing
+		List<String> stopList = IndexedDataReader.getStopWords_TermFrequencyFile(InvertedIndexFName_TF, 50);
+		for (String word : stopList) {
+			if (!stopWords.contains(word)) stopWords.add(word);
+		}
+		return stopWords;
+	}
 }
