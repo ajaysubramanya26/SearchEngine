@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package neu.ir.cs6200.querydata;
 
@@ -19,19 +19,19 @@ import neu.ir.cs6200.constants.Const_FilePaths;
 
 /**
  * Class to perform the Theasuri Query Expansion.
- * 
+ *
  * @author kamlendrak
  *
  */
 public class SynonymQueryExpansion {
 
-	private static Logger logger = Logger.getLogger(PseudoRevelance.class);
+	private static Logger logger = Logger.getLogger(SynonymQueryExpansion.class);
 
 	private static SynonymMap wordSynonymsMap = loadSynonyms();
 
 	/**
 	 * Loads the synonyms from the file into memory.
-	 * 
+	 *
 	 * @return
 	 */
 	private static SynonymMap loadSynonyms() {
@@ -47,7 +47,7 @@ public class SynonymQueryExpansion {
 
 	/**
 	 * Returns the expanded queries.
-	 * 
+	 *
 	 * @param rawQueries
 	 * @return
 	 */
@@ -65,9 +65,9 @@ public class SynonymQueryExpansion {
 
 	/**
 	 * Expands the given query
-	 * 
+	 *
 	 * @param query
-	 * @param stopwords 
+	 * @param stopwords
 	 * @return
 	 */
 	private static String expandQuery(String query, IndexedDataReader index, Set<String> stopwords) {
@@ -77,19 +77,21 @@ public class SynonymQueryExpansion {
 		StringBuilder builder = new StringBuilder();
 		String[] queryTerms = query.split("\\s");
 		for (String queryTerm : queryTerms) {
-			if(!stopwords.contains(queryTerm)) {
+			if (!stopwords.contains(queryTerm)) {
 				builder.append(expandQueryTerm(queryTerm, index) + " ");
 			} else {
 				builder.append(queryTerm + " ");
 			}
 		}
-		logger.info("Query Expansion : \n" + query + "\n" + builder.toString().trim());
+		if (logger.isDebugEnabled()) {
+			logger.debug("Query Expansion : \n" + query + "\n" + builder.toString().trim());
+		}
 		return builder.toString().trim();
 	}
 
 	/**
 	 * Expands the given query term.
-	 * 
+	 *
 	 * @param queryTerm
 	 * @return
 	 */
