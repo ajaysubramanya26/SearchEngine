@@ -11,7 +11,35 @@ Given CACM is found under folder data.
 
 
 Document structure:
+.
+├── IR_Project_cs6200.pdf
+├── README.txt
+├── Results
+│   ├── Evaluation_Results
+│   ├── ExpandedQueries
+│   ├── Indexer_Output
+│   ├── Parser_Output
+│   ├── Parser_Output_NoStopWords
+│   ├── Query_Results
+│   ├── Tokenizer_Output
+│   └── Tokenizer_Output_NoStopWords
+├── data
+│   ├── cacm
+│   ├── cacm.query
+│   ├── cacm.rel
+│   ├── cacm.tar.gz
+│   ├── cacm_stem.query.txt
+│   ├── cacm_stem.txt
+│   ├── common_words
+│   └── wn_s.pl
+├── log4j.properties
+├── makefile
+├── pom.xml
+└── src
+    ├── main
+    └── test
 
+14 directories, 12 files
 
 
 neu.ir.cs6200.ir_project.App.java is the main class which setup and runs everything.
