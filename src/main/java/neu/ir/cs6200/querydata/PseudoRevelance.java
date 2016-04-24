@@ -155,7 +155,9 @@ public class PseudoRevelance {
 		Map<String, Integer> tfHmRelevanceDocs = new HashMap<>();
 		Map<String, Integer> dfHmRelevanceDocs = new HashMap<>();
 
-		logger.info("Running Pseudo Revelance for Query Id " + queryId + " Mode " + mode);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Running Pseudo Revelance for Query Id " + queryId + " Mode " + mode);
+		}
 
 		boolean res = buildTermFrequencyRevelanceDocs((getTopNQueryResultDocs(queryId, mode, topNQueryDocs)),
 				removeStopWords, tfHmRelevanceDocs, dfHmRelevanceDocs);
@@ -167,7 +169,6 @@ public class PseudoRevelance {
 		}
 		Map<String, Integer> sortedMap = SortUtils.sortByValue(tfHmRelevanceDocs, true);
 
-		// TODO : Advanced Scoring function
 		int num = 0;
 		List<String> rawQueryTerms = Arrays.asList(qReader.getRaw_query(queryId).split("\\s"));
 		for (String term : sortedMap.keySet()) {
@@ -195,11 +196,13 @@ public class PseudoRevelance {
 	private void writeToFile(int queryId, Mode mode, QueryDataReader qReader, String kExpandedQueryTerms,
 			Map<String, Integer> sortedMap) {
 		File file = new File(Pseudo_Relevance + "/Q" + queryId);
-		logger.info("Raw Q Terms : " + qReader.getRaw_query(queryId));
+
 		if (logger.isDebugEnabled()) {
+			logger.debug("Raw Q Terms : " + qReader.getRaw_query(queryId));
 			logger.debug("All terms from top 20(collection set) docs found for a Q(sorted on TF) : " + sortedMap);
+			logger.debug("Expanded Q Terms(without Raw Q terms) : " + kExpandedQueryTerms);
 		}
-		logger.info("Expanded Q Terms(without Raw Q terms) : " + kExpandedQueryTerms);
+
 		try {
 			Files.append(new StringBuilder(
 					"\nFor query " + queryId + " Mode " + mode + "\nRaw query terms : " + qReader.getRaw_query(queryId))

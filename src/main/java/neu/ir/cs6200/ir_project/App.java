@@ -75,7 +75,7 @@ public class App {
 		Parser.setUseStopList(false);
 		Parser.parseStore(CorpusDirLoc, ParsedDirName);
 		Tokenizer rawTokens = new Tokenizer(InvertedIndexFName_Uni, InvertedIndexFName_TF, InvertedIndexFName_DF,
-		        IndexMode.NORMAL);
+				IndexMode.NORMAL);
 		rawTokens.tokenizeIndex(ParsedDirName, 1);
 
 		QueryDataReader queryReader = new QueryDataReader();
@@ -88,7 +88,7 @@ public class App {
 		runTask1_RawQueries(queryReader, indexReader);
 
 		Map<Integer, String> synonymExpandedQueries = SynonymQueryExpansion.expandQueries(queryReader.getRaw_queries(),
-		        indexReader);
+				indexReader);
 		runTask2_QueryExpansion(queryReader, indexReader, synonymExpandedQueries);
 
 		runTask3_Table7(queryReader, synonymExpandedQueries);
@@ -135,7 +135,7 @@ public class App {
 	 * @param synonymExpandedQueries
 	 */
 	public static void runTask2_QueryExpansion(QueryDataReader queryReader, IndexedDataReader indexReader,
-	        Map<Integer, String> synonymExpandedQueries) {
+			Map<Integer, String> synonymExpandedQueries) {
 		FileUtils.createDirectory(Task2QueryResults);
 
 		PseudoRevelance pseudoRel = new PseudoRevelance(TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE);
@@ -162,7 +162,7 @@ public class App {
 		Parser.setUseStopList(true);
 		Parser.parseStore(CorpusDirLoc, ParsedDirNameNoStopWords);
 		Tokenizer noStopTokenizer = new Tokenizer(InvertedIndexFNameNoStpWrds, InvertedIndexFName_TF + "_NoStopWords",
-		        InvertedIndexFName_DF + "_NoStopWords", IndexMode.STOP);
+				InvertedIndexFName_DF + "_NoStopWords", IndexMode.STOP);
 		noStopTokenizer.tokenizeIndex(ParsedDirNameNoStopWords, 1);
 
 		IndexedDataReader indexReaderNoStopWords = new IndexedDataReader();
@@ -180,21 +180,21 @@ public class App {
 		// table 7
 		// Using stopping and query expansion with TF-IDF
 		TF_IDF tfidf = new TF_IDF(TOPN_QUERY_SEARCH_RES, TaskTable7Results, Consts.TFIDFStopSyn_Fname);
-		tfidf.runTFIDF(synonymExpandedQueries, indexReaderNoStopWords);
+		tfidf.runTFIDF(removeStopWrds((HashMap<Integer, String>) synonymExpandedQueries), indexReaderNoStopWords);
 
 	}
 
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * @param hm
 	 *            a HashMap with stop words , returns
 	 * @return a HashMap without stop words
 	 */
-	public static HashMap<Integer, String> removeStopWrds(HashMap<Integer, String> hm) {
+	public static Map<Integer, String> removeStopWrds(HashMap<Integer, String> hm) {
 		List<String> stpWrds = QueryDataReader.getAllStopWords();
 
-		HashMap<Integer, String> res = new HashMap<>();
+		Map<Integer, String> res = new HashMap<>();
 		for (Integer i : hm.keySet()) {
 			String[] temp = hm.get(i).split(" +");
 			StringBuilder sb = new StringBuilder();
