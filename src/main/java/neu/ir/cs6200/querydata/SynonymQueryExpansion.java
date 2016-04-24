@@ -6,8 +6,10 @@ package neu.ir.cs6200.querydata;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.wordnet.SynonymMap;
@@ -50,12 +52,13 @@ public class SynonymQueryExpansion {
 	 * @return
 	 */
 	public static Map<Integer, String> expandQueries(Map<Integer, String> rawQueries, IndexedDataReader index) {
+		Set<String> stopwords = new HashSet<String>(QueryDataReader.getAllStopWords());
 		if (rawQueries == null || rawQueries.size() == 0) {
 			return rawQueries;
 		}
 		Map<Integer, String> expandedQueries = new HashMap<Integer, String>();
 		for (Entry<Integer, String> rawQuery : rawQueries.entrySet()) {
-			expandedQueries.put(rawQuery.getKey(), expandQuery(rawQuery.getValue(), index));
+			expandedQueries.put(rawQuery.getKey(), expandQuery(rawQuery.getValue(), index, stopwords));
 		}
 		return expandedQueries;
 	}
@@ -64,16 +67,21 @@ public class SynonymQueryExpansion {
 	 * Expands the given query
 	 * 
 	 * @param query
+	 * @param stopwords 
 	 * @return
 	 */
-	private static String expandQuery(String query, IndexedDataReader index) {
+	private static String expandQuery(String query, IndexedDataReader index, Set<String> stopwords) {
 		if (query == null || query.trim().length() == 0) {
 			return query;
 		}
 		StringBuilder builder = new StringBuilder();
 		String[] queryTerms = query.split("\\s");
 		for (String queryTerm : queryTerms) {
-			builder.append(expandQueryTerm(queryTerm, index) + " ");
+			if(!stopwords.contains(queryTerm)) {
+				builder.append(expandQueryTerm(queryTerm, index) + " ");
+			} else {
+				builder.append(queryTerm + " ");
+			}
 		}
 		logger.info("Query Expansion : \n" + query + "\n" + builder.toString().trim());
 		return builder.toString().trim();

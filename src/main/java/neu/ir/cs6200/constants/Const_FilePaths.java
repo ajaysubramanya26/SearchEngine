@@ -44,7 +44,7 @@ public class Const_FilePaths {
 
 	public static final String Temp_IndexLucene = "./Temp_IndexLucene";
 
-	public static final String QUERY_EVALUATION_RESULT_TASK4 = "Results/Evaluation_Results/Task4/";
+	public static final String QUERY_EVALUATION_RESULT_TASK4 = "Results/Evaluation_Results/QueryPrecisionRecall/";
 	public static final String QUERY_EVALUATION_RESULT = "Results/Evaluation_Results/";
 
 	public static final String Expanded_QueryInfo = "Results" + "/" + "ExpandedQueries";
