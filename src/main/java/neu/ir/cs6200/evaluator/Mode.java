@@ -14,7 +14,7 @@ public enum Mode {
 		PSEUDO_REL_QE(Consts.BM25PseudoRel_Fname),
 		SYN_QE(Consts.BM25_Synonym_Fname),
 		STOPPING(Consts.BM25_Stopping_Fname),
-		T7(Consts.LuceneWithoutStopSyn_Fname);
+		T7(Consts.TFIDFStopSyn_Fname);
 
 	public final String mode;
 

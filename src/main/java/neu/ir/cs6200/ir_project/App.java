@@ -19,7 +19,6 @@ import static neu.ir.cs6200.constants.Consts.BM25PseudoRel_Fname;
 import static neu.ir.cs6200.constants.Consts.BM25_FName;
 import static neu.ir.cs6200.constants.Consts.BM25_Stopping_Fname;
 import static neu.ir.cs6200.constants.Consts.BM25_Synonym_Fname;
-import static neu.ir.cs6200.constants.Consts.LuceneWithoutStopSyn_Fname;
 import static neu.ir.cs6200.constants.Consts.Lucene_Fname;
 import static neu.ir.cs6200.constants.Consts.TOPK_QUERY_EXPANDED_TERMS_PSEUDO_RELEVANCE;
 import static neu.ir.cs6200.constants.Consts.TOPN_QUERY_RES_DOCS_PSEUDO_RELEVANCE;
@@ -70,6 +69,7 @@ public class App {
 			return;
 		}
 
+		// Parsing and Indexing
 		Parser.setUseStopList(false);
 		Parser.parseStore(CorpusDirLoc, ParsedDirName);
 		Tokenizer rawTokens = new Tokenizer(InvertedIndexFName_Uni, InvertedIndexFName_TF, InvertedIndexFName_DF,
@@ -89,18 +89,12 @@ public class App {
 				indexReader);
 		runTask2_QueryExpansion(queryReader, indexReader, synonymExpandedQueries);
 
-		runTask3_RawQueries(queryReader);
-
-		// Using stopping and query expansion with lucene
-		FileUtils.createDirectory(TaskTable7Results);
-		Lucene_SimpleAnalyzer.runLucene(synonymExpandedQueries, ParsedDirNameNoStopWords, TaskTable7Results,
-				LuceneWithoutStopSyn_Fname);
+		runTask3_Table7(queryReader, synonymExpandedQueries);
 
 		SearchEngineEvaluator eval = new SearchEngineEvaluator();
 		eval.evaluate();
 
 		logger.info("Done");
-
 	}
 
 	/**
@@ -125,7 +119,7 @@ public class App {
 		Lucene_SimpleAnalyzer.runLucene(queryReader.getRaw_queries(), ParsedDirName, Task1QueryResults, Lucene_Fname);
 
 		// Table3
-		TF_IDF tfidf = new TF_IDF(TOPN_QUERY_SEARCH_RES, Task1QueryResults);
+		TF_IDF tfidf = new TF_IDF(TOPN_QUERY_SEARCH_RES, Task1QueryResults, Consts.TFIDF);
 		tfidf.runTFIDF(queryReader.getRaw_queries(), indexReader);
 	}
 
@@ -153,12 +147,13 @@ public class App {
 	}
 
 	/**
-	 * TASK 3a, 3b
+	 * TASK 3a, 3b, Table 7
 	 *
 	 * @param queryReader
+	 * @param synonymExpandedQueries
 	 * @param indexReader
 	 */
-	public static void runTask3_RawQueries(QueryDataReader queryReader) {
+	public static void runTask3_Table7(QueryDataReader queryReader, Map<Integer, String> synonymExpandedQueries) {
 		System.out.println("running task 3");
 
 		// TASK 3a
@@ -179,6 +174,11 @@ public class App {
 		Parser.setUseStopList(false);
 		int numberOfStemmedDocs = 3204;
 		Parser.stemAndRunBm25(StemmedCorpus, numberOfStemmedDocs);
+
+		// table 7
+		// Using stopping and query expansion with TF-IDF
+		TF_IDF tfidf = new TF_IDF(TOPN_QUERY_SEARCH_RES, TaskTable7Results, Consts.TFIDFStopSyn_Fname);
+		tfidf.runTFIDF(synonymExpandedQueries, indexReaderNoStopWords);
 
 	}
 }

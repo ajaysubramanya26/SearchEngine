@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -53,10 +54,12 @@ public class TF_IDF {
 
 	int topNRankedDocs;
 	String queryResultDir;
+	String qFileAppender;
 
-	public TF_IDF(int topNRankedDocs, String queryResultDir) {
+	public TF_IDF(int topNRankedDocs, String queryResultDir, String qFileAppender) {
 		this.topNRankedDocs = topNRankedDocs;
 		this.queryResultDir = queryResultDir;
+		this.qFileAppender = qFileAppender;
 	}
 
 	public HashMap<String, HashMap<String, Integer>> getInvertedLists() {
@@ -129,8 +132,7 @@ public class TF_IDF {
 	 * tf(t,d) = (1 + log(ft,d)) or zero if ft,d is zero; Reference :Wikipedia
 	 * <br>
 	 * idf = log(N/n(t)) <br>
-	 * Normalize by idf = Math.pow((1 + log(ft,d)) *log(N/n(t)), 2) and finally
-	 * taking log at the end of all query terms.
+	 *
 	 *
 	 * @param queryStr
 	 * @param qNum
@@ -183,7 +185,7 @@ public class TF_IDF {
 		int topRanked = 1;
 
 		try {
-			File fileQResBM25 = new File(this.queryResultDir + "/Q" + qNum + "_TFIDF");
+			File fileQResBM25 = new File(this.queryResultDir + "/Q" + qNum + "_" + qFileAppender);
 
 			for (Double rankScore : sortedRanks.keySet()) {
 				List<String> docIds = sortedRanks.get(rankScore);
@@ -200,7 +202,13 @@ public class TF_IDF {
 		}
 	}
 
-	public void runTFIDF(HashMap<Integer, String> queries, IndexedDataReader indexReader) {
+	/**
+	 * Run TF-IDF
+	 *
+	 * @param queries
+	 * @param indexReader
+	 */
+	public void runTFIDF(Map<Integer, String> queries, IndexedDataReader indexReader) {
 
 		logger.info("Running TFIDF");
 

@@ -4,6 +4,7 @@ import static neu.ir.cs6200.constants.Const_FilePaths.InvertedIndexDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.Results;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStemmedResults;
 import static neu.ir.cs6200.constants.Const_FilePaths.Task3QueryStopWordsResults;
+import static neu.ir.cs6200.constants.Const_FilePaths.TaskTable7Results;
 import static neu.ir.cs6200.constants.Const_FilePaths.Temp_IndexLucene;
 import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirName;
 import static neu.ir.cs6200.constants.Const_FilePaths.TokenizerDirNameNoStopWrds;
@@ -68,6 +69,7 @@ public class FileUtils {
 		FileUtils.createDirectory(InvertedIndexDirName);
 		FileUtils.createDirectory(Task3QueryStopWordsResults);
 		FileUtils.createDirectory(Task3QueryStemmedResults);
+		FileUtils.createDirectory(TaskTable7Results);
 	}
 
 }
