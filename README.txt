@@ -1,7 +1,7 @@
 Authors : Smitha Bangalore Naresh, Kamlendra Kumar, Ajay Subramanya
 emails : bangalorenaresh.s@husky.neu.edu 
-		kumar.ka@husky.neu.edu
-		subramanya.a@husky.neu.edu
+	 kumar.ka@husky.neu.edu
+	 subramanya.a@husky.neu.edu
 
 Using Java and Maven. 
 
@@ -32,7 +32,9 @@ View in Results go to “Results” folder.
 NOTE : Results folder will be overwritten with each run.
 
 Directory structure of Results are as follows.
-Parser_Output, Indexer_Output, Tokenizer_Output, ExpandedQueries are results of each step r.p.t
+Parser_Output, Indexer_Output, Temp_IndexLucene,Tokenizer_Output, 
+ExpandedQueries, Parser_Output_NoStopWords, 
+Tokenizer_Output_NoStopWords are results of each step r.p.t
 
 The 7 tables can be found under:
 
@@ -41,10 +43,10 @@ Results/Query_Results/Task1/<QNUM>_Lucene
 Results/Query_Results/Task1/<QNUM>_TFIDF
 
 Results/Query_Results/Task2/<QNUM>_BM25PseudoRel
-Results/Query_Results/Task2/<QNUM>_QE2
+Results/Query_Results/Task2/<QNUM>_ BM25SynRel
 
 Results/Query_Results/Task3/<QNUM>_BM25Stopping
-Results/Query_Results/Task3/<QNUM>_TFIDFStopStem
+Results/Query_Results/Task3/<QNUM>_T7
 
 
 The Results for the Evaluation are found under    
@@ -53,7 +55,7 @@ BM25
 Lucene
 TFIDF
 BM25PseudoRel
-QE2
+BM25SynRel
 BM25Stopping
-TFIDFStopStem
+T7
 
