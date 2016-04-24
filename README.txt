@@ -1,6 +1,7 @@
-README :
-Author : Smitha Bangalore Naresh
-email : bangalorenaresh.s@husky.neu.edu
+Authors : Smitha Bangalore Naresh, Kamlendra Kumar, Ajay Subramanya
+emails : bangalorenaresh.s@husky.neu.edu 
+		kumar.ka@husky.neu.edu
+		subramanya.a@husky.neu.edu
 
 Using Java and Maven. 
 
@@ -18,7 +19,7 @@ neu.ir.cs6200.ir_project.App.java is the main class which setup and runs everyth
 logs are written in under ./log/ask_ir.log folder
 
 #############################################################################################
-To BUILD and RUN use the following make command(it builds and run):
+To BUILD and RUN use the following make command(it builds and runs):
 make run_ask_ir
 
 Approximate run time is around 2~3mins
